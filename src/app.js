@@ -1,7 +1,11 @@
 import express from 'express'
+import cors from 'cors'
 import router from './routes/routes.js'
 
 const app = express()
+
+// cors middleware
+app.use(cors())
 
 // json parser middleware
 app.use(express.json())

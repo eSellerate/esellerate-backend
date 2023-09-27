@@ -1,10 +1,11 @@
 import { Router } from 'express'
 
 // import controllers
-import { sayHello } from '../controllers/example.controller.js'
+import { getProfile, getMercadoLibreCategories } from '../controllers/example.controller.js'
 
 const router = Router()
 
-router.get('/', sayHello)
+router.get('/mercado-libre/profile', getProfile)
+router.get('/mercado-libre/categories', getMercadoLibreCategories)
 
 export default router
