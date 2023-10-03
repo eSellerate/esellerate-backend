@@ -11,3 +11,21 @@ export const getCategories = async () => {
     return HandleAxiosResponse.handleError(error)
   }
 }
+
+export const getChildCategories = async (id) => {
+  try {
+    const response = await axios.get(`https://api.mercadolibre.com/categories/${id}`)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const getPostTypes = async () => {
+  try {
+    const response = await axios.get('https://api.mercadolibre.com/sites/MLM/listing_types')
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
