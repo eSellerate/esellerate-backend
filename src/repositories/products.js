@@ -29,3 +29,25 @@ export const getPostTypes = async () => {
     return HandleAxiosResponse.handleError(error)
   }
 }
+
+export const getItems = async (sellerID) => {
+  try {
+    const response = await axios.get(`https://api.mercadolibre.com/users/${sellerID}/items/search?catalog_listing=false`, {
+      headers: {
+        Authorization: process.env.TOKEN
+      }
+    })
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const getUserProducts = async (productID) => {
+  try {
+    const response = await axios.get(`https://api.mercadolibre.com/items/${productID}`)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
