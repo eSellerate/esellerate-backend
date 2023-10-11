@@ -9,7 +9,9 @@ import {
   getMercadoLibreItems,
   getMercadoLibreUserProducts,
   createMercadoLibrePublication,
-  createMercadoLibrePublicationTest
+  createMercadoLibrePublicationTest,
+  closeMercadoLibrePublication,
+  deleteMercadoLibrePublication
 } from '../controllers/example.controller.js'
 
 const router = Router()
@@ -22,5 +24,7 @@ router.get('/mercado-libre/items', getMercadoLibreItems)
 router.get('/mercado-libre/product', getMercadoLibreUserProducts)
 router.get('/mercado-libre/publish', createMercadoLibrePublication)
 router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
+router.get('/mercado-libre/close', closeMercadoLibrePublication)
+router.get('/mercado-libre/delete', deleteMercadoLibrePublication)
 
 export default router

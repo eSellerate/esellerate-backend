@@ -56,14 +56,13 @@ export const getUserProducts = async (productID) => {
 
 export const createPublication = async (publicationData) => {
   try {
-    let baseConfig = {
-      url: baseUrl + '/items',
+    const url = baseUrl + '/items'
+    const options = {
       headers: {
-        Authorization: 'Bearer APP_USR-7741438893697913-100415-7ed277435391055f7e6a70db3bec7126-1489297309'
+        Authorization: process.env.TOKEN,
       },
     }
-    let config = baseConfig.concat(publicationData);
-    const response = await axios.post(config)
+    const response = await axios.post(url, publicationData, options)
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
@@ -74,7 +73,7 @@ export const createPublicationTest = async () => {
   try {
     const url = baseUrl + '/items'
     const data = {
-      title: "Muñeco MALO - No Ofertar",
+      title: "Muñeco MALO REMASTERED - No Ofertar",
       category_id: "MLM455858",
       price: 230,
       currency_id: "MXN",
@@ -119,14 +118,49 @@ export const createPublicationTest = async () => {
       }
     }
     const options = {
-        headers: {
-          Authorization: process.env.TOKEN,
-          'Content-Type': 'application/json',
-        }
+      headers: {
+        Authorization: process.env.TOKEN,
+        'Content-Type': 'application/json',
       }
+    }
     const response = await axios.post(url, data, options)
     return HandleAxiosResponse.handleSuccess(response)
-    } catch (error) {
-      return HandleAxiosResponse.handleError(error)
-    }
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
   }
+}
+
+export const closePublication = async (productID) => {
+  try {
+    const options = {
+      headers: {
+        Authorization: process.env.TOKEN,
+      },
+    }
+    const data = {
+      status: 'closed'
+    }
+    const response = await axios.put(baseUrl + `/items/${productID}`, data, options)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const deletePublication = async (productID) => {
+  closePublication(productID)
+  try {
+    const options = {
+      headers: {
+        Authorization: process.env.TOKEN,
+      },
+    }
+    const data = {
+      deleted: 'true'
+    }
+    const response = await axios.put(baseUrl + `/items/${productID}`, data, options)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}

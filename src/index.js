@@ -10,7 +10,6 @@ import './models/ProductImages.js'
 async function main () {
   try {
     await sequelize.sync({ force: true })
-    console.log('Database connected')
     app.listen(3000 || process.env.PORT, () => {
       console.log(`Server running on port ${process.env.PORT}`)
     })
