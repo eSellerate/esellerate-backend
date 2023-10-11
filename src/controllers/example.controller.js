@@ -6,7 +6,8 @@ import {
   getPostTypes,
   getItems,
   getUserProducts,
-  createPublication
+  createPublication,
+  createPublicationTest
 }
   from '../repositories/products.js'
 
@@ -49,6 +50,7 @@ export const getMercadoLibreUserProducts = async (req, res) => {
     res.status(list.status)
     res.json(list)
   }
+  console.log(list.data)
   const { results } = list.data
   const products = []
   for (let i = 0; i < results.length; i++) {
@@ -71,6 +73,7 @@ export const createMercadoLibrePublication = async (req, res) => {
 
 export const createMercadoLibrePublicationTest = async (req, res) => {
   const response = await createPublicationTest()
+  console.log(response)
   res.status(response.status)
   res.json(response)
 }

@@ -7,7 +7,9 @@ import {
   getMercadoLibreChildCategories,
   getMercadoLibrePostTypes,
   getMercadoLibreItems,
-  getMercadoLibreUserProducts
+  getMercadoLibreUserProducts,
+  createMercadoLibrePublication,
+  createMercadoLibrePublicationTest
 } from '../controllers/example.controller.js'
 
 const router = Router()
@@ -18,5 +20,7 @@ router.get('/mercado-libre/categories/:id', getMercadoLibreChildCategories)
 router.get('/mercado-libre/product-types', getMercadoLibrePostTypes)
 router.get('/mercado-libre/items', getMercadoLibreItems)
 router.get('/mercado-libre/product', getMercadoLibreUserProducts)
+router.get('/mercado-libre/publish', createMercadoLibrePublication)
+router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
 
 export default router
