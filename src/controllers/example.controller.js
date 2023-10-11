@@ -5,7 +5,8 @@ import {
   getChildCategories,
   getPostTypes,
   getItems,
-  getUserProducts
+  getUserProducts,
+  createPublication
 }
   from '../repositories/products.js'
 
@@ -60,4 +61,16 @@ export const getMercadoLibreUserProducts = async (req, res) => {
   }
   res.status(200)
   res.json(products)
+}
+
+export const createMercadoLibrePublication = async (req, res) => {
+  const response = await createPublication(req)
+  res.status(response.status)
+  res.json(response)
+}
+
+export const createMercadoLibrePublicationTest = async (req, res) => {
+  const response = await createPublicationTest()
+  res.status(response.status)
+  res.json(response)
 }
