@@ -14,9 +14,12 @@ import {
   from '../repositories/products.js'
 
 export const getProfile = async (req, res) => {
-  const response = await getUserInfo()
-  const { data } = response
-  res.json(data)
+  try {
+    const { data, status } = await getUserInfo()
+    res.status(status).json(data)
+  } catch (error) {
+    res.status(400).json(error)
+  }
 }
 
 export const getMercadoLibreCategories = async (req, res) => {
