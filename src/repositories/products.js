@@ -73,7 +73,7 @@ export const createPublicationTest = async () => {
   try {
     const url = baseUrl + '/items'
     const data = {
-      title: "Muñeco MALO REMASTERED - No Ofertar",
+      title: "Muñeco MALO - No Ofertar",
       category_id: "MLM455858",
       price: 230,
       currency_id: "MXN",
@@ -148,7 +148,27 @@ export const closePublication = async (productID) => {
 }
 
 export const deletePublication = async (productID) => {
-  closePublication(productID)
+  try {
+    const options = {
+      headers: {
+        Authorization: process.env.TOKEN,
+      },
+    }
+    const dataClose = {
+      status: 'closed'
+    }
+    const dataDelete = {
+      deleted: 'true'
+    }
+    const responseUnused = await axios.put(baseUrl + `/items/${productID}`, dataClose, options)
+    const response = await axios.put(baseUrl + `/items/${productID}`, dataDelete, options)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const modifyPublication = async (data) => {
   try {
     const options = {
       headers: {
