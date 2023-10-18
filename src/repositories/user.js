@@ -7,19 +7,9 @@ import 'dotenv/config'
  * returns user information from Mercado Libre API
  */
 export const getUserInfo = async () => {
-  try {
-    const response = await axios.get('https://api.mercadolibre.com/users/me', {
-      headers: {
-        Authorization: process.env.TOKEN
-      }
-    })
-    return response
-  } catch (error) {
-    const err = {
-      data: {
-        message: error.message
-      }
+  return await axios.get('https://api.mercadolibre.com/users/me', {
+    headers: {
+      Authorization: process.env.TOKEN
     }
-    return err
-  }
+  })
 }

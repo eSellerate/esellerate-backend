@@ -76,44 +76,44 @@ export const createPublicationTest = async () => {
       title: "Muñeco MALO - No Ofertar",
       category_id: "MLM455858",
       price: 230,
-      currency_id: "MXN",
+      currency_id: 'MXN',
       available_quantity: 10,
-      buying_mode: "buy_it_now",
-      condition: "new",
-      listing_type_id: "gold_special",
+      buying_mode: 'buy_it_now',
+      condition: 'new',
+      listing_type_id: 'gold_special',
       sale_terms: [
         {
-          id: "WARRANTY_TYPE",
-          value_name: "Garantía del vendedor"
+          id: 'WARRANTY_TYPE',
+          value_name: 'Garantía del vendedor'
         },
         {
-          id: "WARRANTY_TIME",
-          value_name: "90 días"
+          id: 'WARRANTY_TIME',
+          value_name: '90 días'
         }
       ],
       pictures: [
         {
-          source: "https://m.media-amazon.com/images/I/31H9Cgi4tDL._QL70_ML2_.jpg"
+          source: 'https://m.media-amazon.com/images/I/31H9Cgi4tDL._QL70_ML2_.jpg'
         }
       ],
       attributes: [
         {
-          id: "BRAND",
-          value_name: "Generic"
+          id: 'BRAND',
+          value_name: 'Generic'
         },
         {
-          id: "EAN",
-          value_name: "7898095297749"
+          id: 'EAN',
+          value_name: '7898095297749'
         }
       ],
       shipping: {
-        mode: "not_specified",
+        mode: 'not_specified',
         local_pick_up: false,
         free_shipping: false,
         methods: [],
         dimensions: null,
         tags: [],
-        logistic_type: "not_specified",
+        logistic_type: 'not_specified',
         store_pick_up: false
       }
     }
@@ -134,8 +134,8 @@ export const closePublication = async (productID) => {
   try {
     const options = {
       headers: {
-        Authorization: process.env.TOKEN,
-      },
+        Authorization: process.env.TOKEN
+      }
     }
     const data = {
       status: 'closed'
