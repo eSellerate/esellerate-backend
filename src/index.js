@@ -3,13 +3,11 @@ import { sequelize } from './database/database.js'
 // library to load environment variables from a .env file
 import 'dotenv/config'
 
-import './models/User.js'
-import './models/Product.js'
-import './models/ProductImages.js'
+// import './models/User.js'
 
 async function main () {
   try {
-    await sequelize.sync({ force: true })
+    await sequelize.sync({ force: false })
     app.listen(3000 || process.env.PORT, () => {
       console.log(`Server running on port ${process.env.PORT}`)
     })

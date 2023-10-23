@@ -13,9 +13,11 @@ import {
   closeMercadoLibrePublication,
   deleteMercadoLibrePublication
 } from '../controllers/example.controller.js'
+import { login } from '../controllers/user.controller.js'
 
 const router = Router()
 
+// mercado libre
 router.get('/mercado-libre/profile', getProfile)
 router.get('/mercado-libre/categories', getMercadoLibreCategories)
 router.get('/mercado-libre/categories/:id', getMercadoLibreChildCategories)
@@ -26,5 +28,8 @@ router.get('/mercado-libre/publish', createMercadoLibrePublication)
 router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
 router.get('/mercado-libre/close', closeMercadoLibrePublication)
 router.get('/mercado-libre/delete', deleteMercadoLibrePublication)
+
+// user controller
+router.post('/login', login)
 
 export default router

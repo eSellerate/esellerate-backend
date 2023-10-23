@@ -1,5 +1,5 @@
 // repositories
-import { getUserInfo } from '../repositories/user.js'
+import { getUserInfo, refreshToken } from '../repositories/user.js'
 import {
   getCategories,
   getChildCategories,
@@ -12,10 +12,13 @@ import {
   deletePublication
 }
   from '../repositories/products.js'
+import GetMercadoLibreValues from '../utilities/GetMercadoLibreValues.js'
 
 export const getProfile = async (req, res) => {
   try {
-    const { data, status } = await getUserInfo()
+    // eslint-disable-next-line camelcase
+    const { access_token } = await GetMercadoLibreValues(1)
+    const { data, status } = await getUserInfo(access_token)
     res.status(status).json(data)
   } catch (error) {
     res.status(400).json(error)
@@ -93,4 +96,14 @@ export const deleteMercadoLibrePublication = async (req, res) => {
   const response = await deletePublication(id)
   res.status(response.status)
   res.json(response)
+}
+
+export const refreshTokenMercadoLibre = async (req, res) => {
+  const { clientId, clientSecret, refreshToken } = req.body
+  try {
+    const response = await refreshToken({ clientId, clientSecret, refreshToken })
+    res.status(200).json(response.data)
+  } catch (error) {
+    res.status(400).json(error)
+  }
 }
