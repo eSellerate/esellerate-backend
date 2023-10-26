@@ -13,6 +13,7 @@ import {
 }
   from '../repositories/products.js'
 import GetMercadoLibreValues from '../utilities/GetMercadoLibreValues.js'
+import { getQuestionsAll } from '../repositories/questions.js'
 
 export const getProfile = async (req, res) => {
   try {
@@ -106,4 +107,10 @@ export const refreshTokenMercadoLibre = async (req, res) => {
   } catch (error) {
     res.status(400).json(error)
   }
+}
+
+export const getMercadoLibreQuestionsAll = async (req, res) => {
+  const response = await getQuestionsAll()
+  res.status(response.status)
+  res.json(response)
 }

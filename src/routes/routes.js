@@ -11,7 +11,8 @@ import {
   createMercadoLibrePublication,
   createMercadoLibrePublicationTest,
   closeMercadoLibrePublication,
-  deleteMercadoLibrePublication
+  deleteMercadoLibrePublication,
+  getMercadoLibreQuestionsAll
 } from '../controllers/example.controller.js'
 import { login } from '../controllers/user.controller.js'
 
@@ -28,6 +29,7 @@ router.get('/mercado-libre/publish', createMercadoLibrePublication)
 router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
 router.get('/mercado-libre/close', closeMercadoLibrePublication)
 router.get('/mercado-libre/delete', deleteMercadoLibrePublication)
+router.get('/mercado-libre/questions', getMercadoLibreQuestionsAll)
 
 // user controller
 router.post('/login', login)
