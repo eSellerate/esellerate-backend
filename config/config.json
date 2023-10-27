@@ -2,21 +2,21 @@
   "development": {
     "username": "root",
     "password": null,
-    "database": "test_xd",
+    "database": "esellerate",
     "host": "127.0.0.1",
     "dialect": "mariadb"
   },
   "test": {
     "username": "root",
     "password": null,
-    "database": "text_xd",
+    "database": "esellerate",
     "host": "127.0.0.1",
     "dialect": "mariadb"
   },
   "production": {
     "username": "root",
     "password": null,
-    "database": "test_xd",
+    "database": "esellerate",
     "host": "127.0.0.1",
     "dialect": "mariadb"
   }

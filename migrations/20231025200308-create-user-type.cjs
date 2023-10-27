@@ -15,18 +15,18 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       }
-    }).then(() => queryInterface.addConstraint('user', ['user_type_id'], {
-      type: 'FOREIGN KEY',
-      name: 'id',
+    }).then(() => queryInterface.addConstraint('users', {
+      fields: ['user_type_id'],
+      type: 'foreign key',
+      name: 'fk_user_type_id',
       references: {
-        table: 'user',
-        field: 'user_type_id'
-      },
-      onDelete: 'no action',
-      onUpdate: 'no action'
+        table: 'user_type',
+        field: 'id'
+      }
     }))
   },
   async down (queryInterface, Sequelize) {
+    await queryInterface.removeConstraint('users', 'fk_user_type_id')
     await queryInterface.dropTable('user_type')
   }
 }
