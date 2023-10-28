@@ -16,15 +16,20 @@ export const getUserInfo = async (token) => {
 
 /**
  * @async
- * @param {*} client object with client_id, client_secret and refresh_token
- * @returns Prommise with new access_token
+ * @param client object with client_id, client_secret and refresh_token
+ * @returns response from Mercado Libre API or error
  */
 export const refreshToken = async (client) => {
   const { clientId, clientSecret, refreshToken } = client
-  return await axios.post('https://api.mercadolibre.com/oauth/token', {
-    grant_type: 'refresh_token',
-    client_id: clientId,
-    client_secret: clientSecret,
-    refresh_token: refreshToken
-  })
+  try {
+    const response = await axios.post('https://api.mercadolibre.com/oauth/token', {
+      grant_type: 'refresh_token',
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken
+    })
+    return response
+  } catch (error) {
+    return error.response
+  }
 }

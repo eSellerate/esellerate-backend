@@ -6,7 +6,7 @@ import Products from './Product.js'
 import MercadolibreApp from './MercadolibreApp.js'
 import UserType from './UserType.js'
 
-const User = sequelize.define('user', {
+const User = sequelize.define('users', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -45,7 +45,8 @@ const User = sequelize.define('user', {
     allowNull: true
   }
 }, {
-  freezeTableName: true
+  freezeTableName: true,
+  timestamps: false
 })
 
 // Relations

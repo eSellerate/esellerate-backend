@@ -16,6 +16,9 @@ import {
 } from '../controllers/example.controller.js'
 import { login } from '../controllers/user.controller.js'
 
+// validator
+import { validateLogin } from '../validator/validators.js'
+
 const router = Router()
 
 // mercado libre
@@ -32,6 +35,6 @@ router.get('/mercado-libre/delete', deleteMercadoLibrePublication)
 router.get('/mercado-libre/questions', getMercadoLibreQuestionsAll)
 
 // user controller
-router.post('/login', login)
+router.post('/login', validateLogin, login)
 
 export default router
