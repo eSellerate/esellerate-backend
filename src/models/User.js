@@ -16,10 +16,6 @@ const User = sequelize.define('users', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  mercadolibre_client_id: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   username: {
     type: DataTypes.STRING,
     allowNull: false

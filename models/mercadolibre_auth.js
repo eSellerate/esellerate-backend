@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize')
 module.exports = (sequelize, DataTypes) => {
-  class mercadolibre_app extends Model {
+  class Mercadolibre_auth extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,13 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  mercadolibre_app.init({
-    client_id: DataTypes.STRING,
-    client_secret: DataTypes.STRING,
-    redirect_url: DataTypes.STRING
+  Mercadolibre_auth.init({
+    id: DataTypes.INTEGER,
+    user_id: DataTypes.INTEGER,
+    fk_mlapp: DataTypes.STRING,
+    personal_token: DataTypes.STRING,
+    refresh_token: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'mercadolibre_app'
+    modelName: 'mercadolibre_auth'
   })
-  return mercadolibre_app
+  return Mercadolibre_auth
 }

@@ -3,10 +3,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('users', [
+    await queryInterface.bulkInsert('user', [
       {
         user_type_id: 1,
-        mercadolibre_client_id: '0',
         username: 'root',
         email: 'root@root.com',
         password: '123',
@@ -18,6 +17,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('users', null, {})
+    await queryInterface.bulkDelete('user', null, {})
   }
 }

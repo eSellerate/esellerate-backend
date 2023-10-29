@@ -6,9 +6,8 @@ module.exports = {
     await queryInterface.bulkInsert('mercadolibre_app', [
       {
         client_id: '0',
-        access_token: '0',
         client_secret: '0',
-        refresh_token: '0'
+        redirect_url: 'link'
       }
     ], {})
   },
