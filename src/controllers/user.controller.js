@@ -1,20 +1,15 @@
 /* eslint-disable camelcase */
 // models
 import User from '../models/User.js'
-import MercadolibreApp from '../models/MercadolibreApp.js'
+import MercadoLibreAuth from '../models/MercadoLibreAuth.js'
 
 // repositories
 import { refreshToken as generateNewToken } from '../repositories/user.js'
-import { validationResult } from 'express-validator'
+import checkValidations from '../validator/checkValidations.js'
 
 export const login = async (req, res) => {
   // validate request data
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    res.status(400).json({
-      message: 'Ocurrió un error al iniciar sesión',
-      errors: errors.array()
-    })
+  if (checkValidations(req, res)) {
     return
   }
   // get email and password from request body
@@ -25,7 +20,7 @@ export const login = async (req, res) => {
       email
     },
     include: {
-      model: MercadolibreApp
+      model: MercadoLibreAuth
     }
   })
   // check if password is correct (add bcrypt)
@@ -36,9 +31,9 @@ export const login = async (req, res) => {
     return
   }
   // destructuring mercadolibre app data
-  const { client_id, client_secret, refresh_token } = user.dataValues.mercadolibre_app
-  if (client_id === '0') { // check if user has a mercado libre app associated
-    res.status(200).json({
+  const { mercadolibre_auth } = user.dataValues
+  if (!mercadolibre_auth) { // check if user has a mercado libre app associated
+    res.status(403).json({
       message: 'El usuario no tiene una aplicación de Mercado Libre asociada',
       user: {
         id: user.dataValues.id,
@@ -50,17 +45,38 @@ export const login = async (req, res) => {
     })
     return
   }
+  console.log('data', user.dataValues)
   // try to generate new token
-  const response = await generateNewToken({
-    clientId: client_id,
-    clientSecret: client_secret,
-    refreshToken: refresh_token
-  })
-  // check if new token was generated
-  console.log(response)
   res.status(200).json({})
 }
 
+export const register = async (req, res) => {
+  // handle validator errors
+  if (checkValidations(req, res)) {
+    return
+  }
+  // get request body data
+  const { userType, userName, email, password, firstName, lastName } = req.body
+  try {
+    const user = await User.create({
+      user_type_id: userType,
+      username: userName ?? null,
+      email,
+      password,
+      first_name: firstName,
+      last_name: lastName
+    })
+    res.status(200).json({
+      message: 'Usuario creado correctamente',
+      user
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: 'Ocurrió un error al crear el usuario, intente nuevamente'
+    })
+  }
+}
+
 export const addMercadoLibreApp = async (req, res) => {
-  // get 
+  // get
 }
