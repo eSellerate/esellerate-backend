@@ -6,7 +6,7 @@ import Products from './Product.js'
 import MercadolibreApp from './MercadolibreApp.js'
 import UserType from './UserType.js'
 
-const User = sequelize.define('users', {
+const User = sequelize.define('user', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -17,7 +17,7 @@ const User = sequelize.define('users', {
     allowNull: false
   },
   username: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(20),
     allowNull: false
   },
   email: {
@@ -29,11 +29,11 @@ const User = sequelize.define('users', {
     allowNull: false
   },
   first_name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(30),
     allowNull: false
   },
   last_name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(30),
     allowNull: false
   },
   photo_url: {

@@ -2,23 +2,22 @@ import { DataTypes } from 'sequelize'
 import { sequelize } from '../database/database.js'
 import DbOptions from './dbOption.js'
 
-const UserType = sequelize.define('user_type', {
+const MercadolibreApp = sequelize.define('mercadolibre_auth', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true
+    allowNull: false
   },
-  role: {
-    type: DataTypes.STRING
-  },
-  name: {
+  fk_mlapp: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  descripcion: {
-    type: DataTypes.TEXT,
-    allowNull: false
+  personal_token: {
+    type: DataTypes.STRING
+  },
+  refresh_token: {
+    type: DataTypes.STRING
   }
 }, DbOptions)
 
-export default UserType
+export default MercadolibreApp
