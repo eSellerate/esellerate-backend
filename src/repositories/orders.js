@@ -5,7 +5,7 @@ import 'dotenv/config'
 
 const baseUrl = 'https://api.mercadolibre.com'
 
-export const getQuestionsFromItem = async () => {
+export const _ = async () => {
   try {
     const url = baseUrl + 'search?item=$ITEM_ID'+process.env.SELLER_ID+'&api_version=4'
     const options = {
