@@ -7,7 +7,8 @@ const baseUrl = 'https://api.mercadolibre.com'
 
 export const getQuestionsAll = async () => {
     try {
-        const url = baseUrl + '/questions/search?seller_id=' + process.env.SELLER_ID + '&api_version=4'
+        const url = baseUrl + '/questions/search?seller_id=' + process.env.SELLER_ID 
+            + '&sort_fields=date_created,item_id&api_version=4'
         const options = {
             headers: {
                 Authorization: process.env.TOKEN,
