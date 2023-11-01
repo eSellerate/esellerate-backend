@@ -7,16 +7,22 @@ import {
   getMercadoLibreChildCategories,
   getMercadoLibrePostTypes,
   getMercadoLibreItems,
-  getMercadoLibreUserProducts,
+  getMercadoLibreUserProducts
 } from '../controllers/example.controller.js'
 import {
   createMercadoLibrePublication,
   createMercadoLibrePublicationTest,
   closeMercadoLibrePublication,
-  deleteMercadoLibrePublication,
+  deleteMercadoLibrePublication
 } from '../controllers/publication.controller.js'
 import { login } from '../controllers/user.controller.js'
-import { createMercadoLibreAnswerByQuestionID, deleteMercadoLibreQuestion, getMercadoLibreQuestion, getMercadoLibreQuestionsAll, getMercadoLibreQuestionsFromItem } from '../controllers/questions.controller.js'
+import {
+  createMercadoLibreAnswerByQuestionID,
+  deleteMercadoLibreQuestion,
+  getMercadoLibreQuestion,
+  getMercadoLibreQuestionsAll,
+  getMercadoLibreQuestionsFromItem
+} from '../controllers/questions.controller.js'
 
 const router = Router()
 

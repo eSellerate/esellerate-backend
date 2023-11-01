@@ -2,8 +2,8 @@
 import { 
   getQuestionsAll,
   getQuestionsFromItem,
-  getMercadoLibreQuestion,
-  deleteMercadoLibreQuestion,
+  getQuestion,
+  deleteQuestion,
   createAnswerByQuestionID } from '../repositories/questions.js'
 
 export const getMercadoLibreQuestionsAll = async (req, res) => {
@@ -25,7 +25,7 @@ export const getMercadoLibreQuestion = async (req, res) => {
 }
 
 export const deleteMercadoLibreQuestion = async (req, res) => {
-  const response = await deleteMercadoLibreQuestion(req)
+  const response = await deleteQuestion(req)
   res.status(response.status)
   res.json(response)
 }
