@@ -6,10 +6,6 @@ import {
   getPostTypes,
   getItems,
   getUserProducts,
-  createPublication,
-  createPublicationTest,
-  closePublication,
-  deletePublication
 }
   from '../repositories/products.js'
 import GetMercadoLibreValues from '../utilities/GetMercadoLibreValues.js'
@@ -73,32 +69,6 @@ export const getMercadoLibreUserProducts = async (req, res) => {
   res.json(products)
 }
 
-export const createMercadoLibrePublication = async (req, res) => {
-  const response = await createPublication(req)
-  res.status(response.status)
-  res.json(response)
-}
-
-export const createMercadoLibrePublicationTest = async (req, res) => {
-  const response = await createPublicationTest()
-  res.status(response.status)
-  res.json(response)
-}
-
-export const closeMercadoLibrePublication = async (req, res) => {
-  const { id } = req.query
-  const response = await closePublication(id)
-  res.status(response.status)
-  res.json(response)
-}
-
-export const deleteMercadoLibrePublication = async (req, res) => {
-  const { id } = req.query
-  const response = await deletePublication(id)
-  res.status(response.status)
-  res.json(response)
-}
-
 export const refreshTokenMercadoLibre = async (req, res) => {
   const { clientId, clientSecret, refreshToken } = req.body
   try {
@@ -107,10 +77,4 @@ export const refreshTokenMercadoLibre = async (req, res) => {
   } catch (error) {
     res.status(400).json(error)
   }
-}
-
-export const getMercadoLibreQuestionsAll = async (req, res) => {
-  const response = await getQuestionsAll()
-  res.status(response.status)
-  res.json(response)
 }

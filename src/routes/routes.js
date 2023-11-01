@@ -8,13 +8,15 @@ import {
   getMercadoLibrePostTypes,
   getMercadoLibreItems,
   getMercadoLibreUserProducts,
+} from '../controllers/example.controller.js'
+import {
   createMercadoLibrePublication,
   createMercadoLibrePublicationTest,
   closeMercadoLibrePublication,
   deleteMercadoLibrePublication,
-  getMercadoLibreQuestionsAll
-} from '../controllers/example.controller.js'
+} from '../controllers/publication.controller.js'
 import { login } from '../controllers/user.controller.js'
+import { getMercadoLibreQuestionsAll } from '../controllers/questions.controller.js'
 
 const router = Router()
 
