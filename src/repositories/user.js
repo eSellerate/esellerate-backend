@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import axios from 'axios'
 import 'dotenv/config'
 
@@ -12,6 +13,28 @@ export const getUserInfo = async (token) => {
       Authorization: `Bearer ${token}`
     }
   })
+}
+
+/**
+ * generates a new token from Mercado Libre API
+ * @async
+ * @param client object with client_id, client_secret, redirect_uri and code
+ * @returns response from Mercado Libre API or error
+ */
+export const generateNewToken = async (client) => {
+  const { client_id, client_secret, redirect_uri, code } = client
+  try {
+    const response = await axios.post('https://api.mercadolibre.com/oauth/token', {
+      grant_type: 'authorization_code',
+      client_id,
+      client_secret,
+      code,
+      redirect_uri
+    })
+    return response
+  } catch (error) {
+    return error.response
+  }
 }
 
 /**

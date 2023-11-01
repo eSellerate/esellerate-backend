@@ -14,10 +14,11 @@ import {
   deleteMercadoLibrePublication,
   getMercadoLibreQuestionsAll
 } from '../controllers/example.controller.js'
-import { login, register } from '../controllers/user.controller.js'
+import { login, register, addNewMercadoLibreApp } from '../controllers/user.controller.js'
 
-// validator
+// middlewares
 import { validateLogin, validateRegister } from '../validator/validators.js'
+import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
 
 const router = Router()
 
@@ -37,5 +38,6 @@ router.get('/mercado-libre/questions', getMercadoLibreQuestionsAll)
 // user controller
 router.post('/login', validateLogin, login)
 router.post('/register', validateRegister, register)
+router.get('/add-mercadolibre-app', checkCookieCredentials, addNewMercadoLibreApp)
 
 export default router

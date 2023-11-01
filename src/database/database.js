@@ -8,6 +8,7 @@ export const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: 'mariadb',
+    storage: './session.mysql',
     define: {
       freezeTableName: true
     }

@@ -2,9 +2,14 @@
 // models
 import User from '../models/User.js'
 import MercadoLibreAuth from '../models/MercadoLibreAuth.js'
+import MercadoLibreApp from '../models/MercadoLibreApp.js'
+import crypto from 'crypto'
 
 // repositories
-import { refreshToken as generateNewToken } from '../repositories/user.js'
+import {
+  generateNewToken
+} from '../repositories/user.js'
+// middleware
 import checkValidations from '../validator/checkValidations.js'
 
 export const login = async (req, res) => {
@@ -30,11 +35,31 @@ export const login = async (req, res) => {
     })
     return
   }
+
+  // create and store session
+  const sessionObject = {
+    id: user.dataValues.id,
+    email: user.dataValues.email,
+    password: user.dataValues.password,
+    firstName: user.dataValues.first_name,
+    lastName: user.dataValues.last_name
+  }
+  // generate session id and store session
+  const sid = crypto.randomUUID()
+  req.sessionStore.set(sid, sessionObject, (error) => {
+    if (error) {
+      res.status(500).json({
+        message: 'Ocurrió un error al iniciar sesión, intente nuevamente'
+      })
+    }
+  })
+
   // destructuring mercadolibre app data
   const { mercadolibre_auth } = user.dataValues
   if (!mercadolibre_auth) { // check if user has a mercado libre app associated
-    res.status(403).json({
+    res.status(200).json({
       message: 'El usuario no tiene una aplicación de Mercado Libre asociada',
+      sid,
       user: {
         id: user.dataValues.id,
         email: user.dataValues.email,
@@ -43,6 +68,8 @@ export const login = async (req, res) => {
         photoUrl: user.dataValues.photo_url
       }
     })
+    // delete session
+    req.session.destroy()
     return
   }
   console.log('data', user.dataValues)
@@ -77,6 +104,64 @@ export const register = async (req, res) => {
   }
 }
 
-export const addMercadoLibreApp = async (req, res) => {
-  // get
+export const testSession = async (req, res) => {
+  console.log(req.user)
+  res.status(200).json({
+    message: 'Session ok',
+    session: req.session
+  })
+}
+
+export const addNewMercadoLibreApp = async (req, res) => {
+  // get parameters from request
+  const {
+    client_id,
+    client_secret,
+    redirect_uri
+  } = req.body
+  // find client_id in "mercadolibre_app" table in database
+  const mercadoLibreApp = await MercadoLibreApp.findOne({
+    where: {
+      client_id
+    }
+  })
+  // check if client_id exists
+  if (mercadoLibreApp) {
+    res.status(404).json({
+      message: `La aplicación con client_id ${client_id} ya existe`
+    })
+    return
+  }
+  // generate new token
+  const generatedToken = await generateNewToken(req.body)
+  if (generatedToken.status !== 200) {
+    res.status(generatedToken.status).json({
+      message: generatedToken.data.message
+    })
+    return
+  }
+  // create new mercado libre app
+  try {
+    const newMercadoLibreApp = await MercadoLibreApp.create({
+      client_id,
+      client_secret,
+      redirect_url: redirect_uri
+    })
+    await MercadoLibreAuth.create({
+      id: req.user.id,
+      fk_mlapp: newMercadoLibreApp.dataValues.client_id,
+      personal_token: generatedToken.data.access_token,
+      refresh_token: generatedToken.data.refresh_token
+    })
+    // if everything is ok, return success message
+    res.status(200).json({
+      message: 'Aplicación de Mercado Libre creada correctamente',
+      data: generatedToken.data
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: error.errors[0].message
+    })
+  }
 }
