@@ -4,13 +4,20 @@ import router from './routes/routes.js'
 import { sequelize } from './database/database.js'
 import session from 'express-session'
 import SequelizeStore from 'connect-session-sequelize'
+import cookieParser from 'cookie-parser'
 import 'dotenv/config'
 // import router from './routes/routes.js'
 
 const app = express()
 
+app.use(cookieParser())
+
 // cors middleware
-app.use(cors())
+app.use(cors({
+  origin: ['http://127.0.0.1:5173'],
+  credentials: true,
+  exposedHeaders: ['Cookie']
+}))
 
 // json parser middleware
 app.use(express.json())

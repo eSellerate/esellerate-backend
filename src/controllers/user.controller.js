@@ -45,7 +45,7 @@ export const login = async (req, res) => {
     lastName: user.dataValues.last_name
   }
   // generate session id and store session
-  const sid = crypto.randomUUID()
+  const sid = req.session.id
   req.sessionStore.set(sid, sessionObject, (error) => {
     if (error) {
       res.status(500).json({
@@ -57,7 +57,7 @@ export const login = async (req, res) => {
   // destructuring mercadolibre app data
   const { mercadolibre_auth } = user.dataValues
   if (!mercadolibre_auth) { // check if user has a mercado libre app associated
-    res.status(200).json({
+    res.status(202).json({
       message: 'El usuario no tiene una aplicación de Mercado Libre asociada',
       sid,
       user: {
@@ -164,4 +164,23 @@ export const addNewMercadoLibreApp = async (req, res) => {
       message: error.errors[0].message
     })
   }
+}
+
+export const validateApp = async (req, res) => {
+  // extract user from cookie
+  const user = req.user
+  // look if user has a mercadolibre auth
+  console.log('hola', user)
+  const mlAuth = await MercadoLibreAuth.findOne({
+    where: {
+      id: user.id
+    }
+  })
+  if (!mlAuth) {
+    res.status(400).json({
+      message: 'No tienes aplicación de mercado libre vinculada.'
+    })
+    return
+  }
+  res.status(200).json({ user })
 }

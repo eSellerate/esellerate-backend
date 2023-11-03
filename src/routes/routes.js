@@ -14,7 +14,7 @@ import {
   deleteMercadoLibrePublication,
   getMercadoLibreQuestionsAll
 } from '../controllers/example.controller.js'
-import { login, register, addNewMercadoLibreApp } from '../controllers/user.controller.js'
+import { login, register, addNewMercadoLibreApp, validateApp } from '../controllers/user.controller.js'
 
 // middlewares
 import { validateLogin, validateRegister } from '../validator/validators.js'
@@ -39,5 +39,6 @@ router.get('/mercado-libre/questions', getMercadoLibreQuestionsAll)
 router.post('/login', validateLogin, login)
 router.post('/register', validateRegister, register)
 router.get('/add-mercadolibre-app', checkCookieCredentials, addNewMercadoLibreApp)
+router.get('/validate-ml-app', checkCookieCredentials, validateApp)
 
 export default router
