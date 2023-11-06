@@ -1,26 +1,23 @@
 export const checkCookieCredentials = async (req, res, next) => {
   // get session id from cookie
   const { authorization } = req.headers
-  console.log(authorization)
-  if (!req.headers.cookie) {
+  if (!authorization) {
     res.status(401).json({
       message: 'No has iniciado sesión.'
     })
     return
   }
-  const cookies = req.headers.cookie.split(';')
-  const userCookie = cookies.find(cookie => cookie.includes('user-cookie'))
-  if (!userCookie) {
-    res.status(401).json({
-      message: 'No has iniciado sesión.'
-    })
-    return
-  }
-  // extract session id
-  const sid = userCookie.split('=')[1]
+  // extract bearer token
+  const sid = authorization.split(' ')[1]
   // get session from database
   try {
     req.user = await req.sessionStore.get(sid)
+    if (!req.user) {
+      res.status(401).json({
+        message: 'No se encontró la sesión.'
+      })
+      return
+    }
     next()
   } catch (error) {
     res.status(500).json({

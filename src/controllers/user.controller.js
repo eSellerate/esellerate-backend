@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 // models
 import User from '../models/User.js'
+import UserType from '../models/UserType.js'
 import MercadoLibreAuth from '../models/MercadoLibreAuth.js'
 import MercadoLibreApp from '../models/MercadoLibreApp.js'
-import crypto from 'crypto'
 
 // repositories
 import {
@@ -72,9 +72,19 @@ export const login = async (req, res) => {
     req.session.destroy()
     return
   }
-  console.log('data', user.dataValues)
   // try to generate new token
-  res.status(200).json({})
+  req.session.destroy()
+  res.status(200).json({
+    message: 'Bienvenido/a!',
+    sid,
+    user: {
+      id: user.dataValues.id,
+      email: user.dataValues.email,
+      firstName: user.dataValues.first_name,
+      lastName: user.dataValues.last_name,
+      photoUrl: user.dataValues.photo_url
+    }
+  })
 }
 
 export const register = async (req, res) => {
@@ -117,70 +127,106 @@ export const addNewMercadoLibreApp = async (req, res) => {
   const {
     client_id,
     client_secret,
-    redirect_uri
+    redirect_uri,
+    auth_code
   } = req.body
-  // find client_id in "mercadolibre_app" table in database
+  // check if client_id is already registered
   const mercadoLibreApp = await MercadoLibreApp.findOne({
     where: {
       client_id
     }
   })
-  // check if client_id exists
+  // get user from cookie
+  const user = req.user
   if (mercadoLibreApp) {
-    res.status(404).json({
-      message: `La aplicación con client_id ${client_id} ya existe`
+    // asosiate app with user
+    const { client_secret, redirect_url } = mercadoLibreApp.dataValues
+    // generate new token
+    const response = await generateNewToken({
+      client_id,
+      client_secret,
+      redirect_uri: redirect_url,
+      code: auth_code
+    })
+    if (response.status !== 200) {
+      res.status(response.status).json(response.data)
+      return
+    }
+    const { access_token, refresh_token } = response.data
+    // create new mercado libre auth
+    await MercadoLibreAuth.create({
+      id: user.id,
+      fk_mlapp: client_id,
+      personal_token: access_token,
+      refresh_token
+    })
+    res.status(200).json({
+      message: 'La aplicación se vinculó correctamente con el usuario.'
     })
     return
   }
   // generate new token
-  const generatedToken = await generateNewToken(req.body)
-  if (generatedToken.status !== 200) {
-    res.status(generatedToken.status).json({
-      message: generatedToken.data.message
-    })
+  const response = await generateNewToken({
+    client_id,
+    client_secret,
+    redirect_uri,
+    code: auth_code
+  })
+  if (response.status !== 200) {
+    res.status(response.status).json(response.data)
     return
   }
+  const { access_token, refresh_token } = response.data
   // create new mercado libre app
-  try {
-    const newMercadoLibreApp = await MercadoLibreApp.create({
-      client_id,
-      client_secret,
-      redirect_url: redirect_uri
-    })
-    await MercadoLibreAuth.create({
-      id: req.user.id,
-      fk_mlapp: newMercadoLibreApp.dataValues.client_id,
-      personal_token: generatedToken.data.access_token,
-      refresh_token: generatedToken.data.refresh_token
-    })
-    // if everything is ok, return success message
-    res.status(200).json({
-      message: 'Aplicación de Mercado Libre creada correctamente',
-      data: generatedToken.data
-    })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({
-      message: error.errors[0].message
-    })
-  }
+  await MercadoLibreApp.create({
+    client_id,
+    client_secret,
+    redirect_url: redirect_uri
+  })
+  // create new mercado libre auth
+  await MercadoLibreAuth.create({
+    id: user.id,
+    fk_mlapp: client_id,
+    personal_token: access_token,
+    refresh_token
+  })
+  res.status(200).json({
+    message: 'Se registró la aplicación correctamente.'
+  })
 }
 
 export const validateApp = async (req, res) => {
   // extract user from cookie
   const user = req.user
   // look if user has a mercadolibre auth
-  console.log('hola', user)
   const mlAuth = await MercadoLibreAuth.findOne({
     where: {
       id: user.id
     }
   })
   if (!mlAuth) {
-    res.status(400).json({
+    res.status(202).json({
       message: 'No tienes aplicación de mercado libre vinculada.'
     })
     return
   }
   res.status(200).json({ user })
+}
+
+export const getProfile = async (req, res) => {
+  // extract user from cookie
+  const user = await User.findOne({
+    attributes: {
+      exclude: ['password', 'user_type_id']
+    },
+    where: {
+      id: req.user.id
+    },
+    include: {
+      model: UserType
+    }
+  })
+  res.status(200).json({
+    user
+  })
 }

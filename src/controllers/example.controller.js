@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 // repositories
 import { getUserInfo, refreshToken } from '../repositories/user.js'
 import {
@@ -12,15 +13,35 @@ import {
   deletePublication
 }
   from '../repositories/products.js'
-import GetMercadoLibreValues from '../utilities/GetMercadoLibreValues.js'
+import { GetMercadoLibreAuthValues, GetMercadoLibreAppValues, SetMercadoLibreAuthValues } from '../utilities/MercadoLibreAuth.js'
 import { getQuestionsAll } from '../repositories/questions.js'
 
 export const getProfile = async (req, res) => {
+  const user = req.user
   try {
-    // eslint-disable-next-line camelcase
-    const { access_token } = await GetMercadoLibreValues(1)
-    const { data, status } = await getUserInfo(access_token)
-    res.status(status).json(data)
+    const { fk_mlapp, personal_token, refresh_token } = await GetMercadoLibreAuthValues(user.id)
+    const response = await getUserInfo(personal_token)
+    if (response.status !== 200) {
+      // get client_secrets
+      const { client_secret } = await GetMercadoLibreAppValues(fk_mlapp)
+      // try to refresh token
+      const response = await refreshToken({
+        clientId: fk_mlapp,
+        clientSecret: client_secret,
+        refreshToken: refresh_token
+      })
+      if (response.status !== 200) {
+        res.status(response.status).json(response.data)
+      }
+      // update token
+      await SetMercadoLibreAuthValues(user.id, response.data)
+      if (response.status === 200) {
+        res.status(response.status).json(response)
+      }
+    }
+    if (response.status === 200) {
+      res.status(response.status).json(response.data)
+    }
   } catch (error) {
     res.status(400).json(error)
   }
@@ -53,8 +74,17 @@ export const getMercadoLibreItems = async (req, res) => {
 }
 
 export const getMercadoLibreUserProducts = async (req, res) => {
-  const { id } = req.query
-  const list = await getItems(id)
+  // get user
+  const user = req.user
+  const mercadolibreValues = await GetMercadoLibreAuthValues(user.id)
+  if (!mercadolibreValues) {
+    res.status(404).json({
+      message: 'El usuaro no tiene una cuenta de Mercado Libre asociada'
+    })
+    return
+  }
+  const { personal_token } = mercadolibreValues
+  const list = await getItems(personal_token)
   if (list.status !== 200) {
     res.status(list.status)
     res.json(list)

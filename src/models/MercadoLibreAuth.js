@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize'
 import { sequelize } from '../database/database.js'
 import DbOptions from './dbOption.js'
 
-const MercadolibreApp = sequelize.define('mercadolibre_auth', {
+const MercadoLibreAuth = sequelize.define('mercadolibre_auth', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -20,4 +20,4 @@ const MercadolibreApp = sequelize.define('mercadolibre_auth', {
   }
 }, DbOptions)
 
-export default MercadolibreApp
+export default MercadoLibreAuth

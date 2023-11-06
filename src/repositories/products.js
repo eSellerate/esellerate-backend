@@ -1,7 +1,9 @@
 import axios from 'axios'
 import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
-
 import 'dotenv/config'
+
+// repository
+import { getUserInfo } from './user.js'
 
 const baseUrl = 'https://api.mercadolibre.com'
 
@@ -32,11 +34,17 @@ export const getPostTypes = async () => {
   }
 }
 
-export const getItems = async (sellerID) => {
+export const getItems = async (token) => {
+  // get user id
+  const user = await getUserInfo(token)
+  if (user.status !== 200) {
+    return user
+  }
+  const { id } = user.data
   try {
-    const response = await axios.get(baseUrl + `/users/${sellerID}/items/search?catalog_listing=false`, {
+    const response = await axios.get(baseUrl + `/users/${id}/items/search?catalog_listing=false`, {
       headers: {
-        Authorization: process.env.TOKEN
+        Authorization: `Bearer ${token}`
       }
     })
     return HandleAxiosResponse.handleSuccess(response)
