@@ -31,7 +31,7 @@ export const deleteMercadoLibreQuestion = async (req, res) => {
 }
 
 export const createMercadoLibreAnswerByQuestionID = async (req, res) => {
-  const response = await createAnswerByQuestionID(req)
+  const response = await createAnswerByQuestionID(req.body)
   res.status(response.status)
   res.json(response)
 }
