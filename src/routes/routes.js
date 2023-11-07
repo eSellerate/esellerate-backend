@@ -16,6 +16,7 @@ import {
 } from '../controllers/example.controller.js'
 import {
   login,
+  logout,
   register,
   addNewMercadoLibreApp,
   validateApp,
@@ -43,6 +44,7 @@ router.get('/mercado-libre/questions', getMercadoLibreQuestionsAll)
 
 // user controller
 router.post('/login', validateLogin, login)
+router.post('/logout', checkCookieCredentials, logout)
 router.post('/register', validateRegister, register)
 router.post('/add-mercadolibre-app', checkCookieCredentials, addNewMercadoLibreApp)
 router.get('/validate-session', checkCookieCredentials, validateApp)

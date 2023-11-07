@@ -1,5 +1,5 @@
 export const checkCookieCredentials = async (req, res, next) => {
-  // get session id from cookie
+  // get session id from cookies
   const { authorization } = req.headers
   if (!authorization) {
     res.status(401).json({
@@ -9,6 +9,7 @@ export const checkCookieCredentials = async (req, res, next) => {
   }
   // extract bearer token
   const sid = authorization.split(' ')[1]
+  req.sid = sid
   // get session from database
   try {
     req.user = await req.sessionStore.get(sid)

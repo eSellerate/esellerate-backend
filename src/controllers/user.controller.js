@@ -7,7 +7,8 @@ import MercadoLibreApp from '../models/MercadoLibreApp.js'
 
 // repositories
 import {
-  generateNewToken
+  generateNewToken,
+  refreshToken
 } from '../repositories/user.js'
 // middleware
 import checkValidations from '../validator/checkValidations.js'
@@ -25,7 +26,10 @@ export const login = async (req, res) => {
       email
     },
     include: {
-      model: MercadoLibreAuth
+      model: MercadoLibreAuth,
+      include: {
+        model: MercadoLibreApp
+      }
     }
   })
   // check if password is correct (add bcrypt)
@@ -72,8 +76,28 @@ export const login = async (req, res) => {
     req.session.destroy()
     return
   }
-  // try to generate new token
   req.session.destroy()
+  // try to refresh token
+  const { client_secret } = user.dataValues.mercadolibre_auth.mercadolibre_apps[0].dataValues
+  const { fk_mlapp, refresh_token } = user.dataValues.mercadolibre_auth
+  const response = await refreshToken({
+    clientId: fk_mlapp,
+    clientSecret: client_secret,
+    refreshToken: refresh_token
+  })
+  if (response.status !== 200) {
+    res.status(response.status).json(response.data)
+    return
+  }
+  // update token
+  await MercadoLibreAuth.update({
+    personal_token: response.data.access_token,
+    refresh_token: response.data.refresh_token
+  }, {
+    where: {
+      id: user.dataValues.id
+    }
+  })
   res.status(200).json({
     message: 'Bienvenido/a!',
     sid,
@@ -84,6 +108,16 @@ export const login = async (req, res) => {
       lastName: user.dataValues.last_name,
       photoUrl: user.dataValues.photo_url
     }
+  })
+}
+
+export const logout = async (req, res) => {
+  // get user from cookie
+  const sid = req.sid
+  // delete session
+  await req.sessionStore.destroy(sid)
+  res.status(200).json({
+    message: 'Sesión cerrada correctamente'
   })
 }
 
