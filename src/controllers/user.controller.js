@@ -127,10 +127,10 @@ export const register = async (req, res) => {
     return
   }
   // get request body data
-  const { userType, userName, email, password, firstName, lastName } = req.body
+  const { userName, email, password, firstName, lastName } = req.body
   try {
     const user = await User.create({
-      user_type_id: userType,
+      user_type_id: 2,
       username: userName ?? null,
       email,
       password,

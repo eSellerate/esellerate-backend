@@ -50,6 +50,16 @@ export const validateRegister = [
     .notEmpty()
     .withMessage('No se ha ingresado una contraseña'),
 
+  body('confirmPassword')
+    .notEmpty()
+    .withMessage('No se ha ingresado una contraseña')
+    .custom((confirmPassword, { req }) => {
+      if (confirmPassword !== req.body.password) {
+        throw new Error('Las contraseñas no coinciden')
+      }
+      return true
+    }),
+
   body('firstName')
     .notEmpty()
     .withMessage('No se ha ingresado un nombre')
@@ -60,11 +70,5 @@ export const validateRegister = [
     .notEmpty()
     .withMessage('No se ha ingresado un apellido')
     .isAlpha()
-    .withMessage('El apellido solo puede contener letras'),
-
-  body('userType')
-    .notEmpty()
-    .withMessage('No se ha ingresado un tipo de usuario')
-    .isNumeric()
-    .withMessage('El tipo de usuario debe ser un número')
+    .withMessage('El apellido solo puede contener letras')
 ]
