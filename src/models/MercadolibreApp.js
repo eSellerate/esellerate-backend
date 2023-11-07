@@ -8,15 +8,11 @@ const MercadolibreApp = sequelize.define('mercadolibre_app', {
     primaryKey: true,
     allowNull: false
   },
-  access_token: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   client_secret: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  refresh_token: {
+  redirect_url: {
     type: DataTypes.STRING,
     allowNull: false
   }

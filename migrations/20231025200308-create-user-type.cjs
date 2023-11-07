@@ -9,13 +9,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      role: {
+        type: Sequelize.STRING
+      },
       name: {
         type: Sequelize.STRING
       },
       description: {
         type: Sequelize.STRING
       }
-    }).then(() => queryInterface.addConstraint('users', {
+    }).then(() => queryInterface.addConstraint('user', {
       fields: ['user_type_id'],
       type: 'foreign key',
       name: 'fk_user_type_id',
@@ -26,7 +29,7 @@ module.exports = {
     }))
   },
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeConstraint('users', 'fk_user_type_id')
+    await queryInterface.removeConstraint('user', 'fk_user_type_id')
     await queryInterface.dropTable('user_type')
   }
 }
