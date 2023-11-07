@@ -9,13 +9,7 @@ import {
   getMercadoLibreItems,
   getMercadoLibreUserProducts
 } from '../controllers/example.controller.js'
-import {
-  createMercadoLibrePublication,
-  createMercadoLibrePublicationTest,
-  closeMercadoLibrePublication,
-  deleteMercadoLibrePublication,
-  getMercadoLibreQuestionsAll
-} from '../controllers/example.controller.js'
+
 import {
   login,
   logout,
@@ -24,9 +18,14 @@ import {
   validateApp,
   getProfile as getUserProfile
 } from '../controllers/user.controller.js'
+
+import {
+  createMercadoLibrePublication,
+  createMercadoLibrePublicationTest,
+  closeMercadoLibrePublication,
   deleteMercadoLibrePublication
 } from '../controllers/publication.controller.js'
-import { login } from '../controllers/user.controller.js'
+
 import {
   createMercadoLibreAnswerByQuestionID,
   deleteMercadoLibreQuestion,
