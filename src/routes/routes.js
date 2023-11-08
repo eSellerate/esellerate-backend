@@ -37,6 +37,7 @@ import {
 // middlewares
 import { validateLogin, validateRegister } from '../validator/validators.js'
 import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
+import { getMercadoLibreToken } from '../middlewares/mercadolibre/getMercadoLibreToken.js'
 
 const router = Router()
 
@@ -49,7 +50,7 @@ router.get('/mercado-libre/items', getMercadoLibreItems)
 router.get('/mercado-libre/product', checkCookieCredentials, getMercadoLibreUserProducts)
 router.get('/mercado-libre/product', getMercadoLibreUserProducts)
 
-//publicaciones
+// publicaciones
 router.get('/mercado-libre/publish', createMercadoLibrePublication)
 router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
 router.get('/mercado-libre/close', closeMercadoLibrePublication)
@@ -62,8 +63,12 @@ router.post('/register', validateRegister, register)
 router.post('/add-mercadolibre-app', checkCookieCredentials, addNewMercadoLibreApp)
 router.get('/validate-session', checkCookieCredentials, validateApp)
 router.get('/profile', checkCookieCredentials, getUserProfile)
-//preguntas
-router.get('/mercado-libre/questions_all', getMercadoLibreQuestionsAll)
+
+// preguntas
+router.get('/mercado-libre/questions_all',
+  checkCookieCredentials,
+  getMercadoLibreToken,
+  getMercadoLibreQuestionsAll)
 router.post('/mercado-libre/questions_from_item', getMercadoLibreQuestionsFromItem)
 router.post('/mercado-libre/question_by_id', getMercadoLibreQuestion)
 router.post('/mercado-libre/question_delete', deleteMercadoLibreQuestion)

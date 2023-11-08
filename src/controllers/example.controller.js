@@ -6,7 +6,7 @@ import {
   getChildCategories,
   getPostTypes,
   getItems,
-  getUserProducts,
+  getUserProducts
 }
   from '../repositories/products.js'
 import { GetMercadoLibreAuthValues, GetMercadoLibreAppValues, SetMercadoLibreAuthValues } from '../utilities/MercadoLibreAuth.js'
