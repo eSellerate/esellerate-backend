@@ -8,11 +8,14 @@ const UserType = sequelize.define('user_type', {
     primaryKey: true,
     autoIncrement: true
   },
+  role: {
+    type: DataTypes.STRING
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  descripcion: {
+  description: {
     type: DataTypes.TEXT,
     allowNull: false
   }

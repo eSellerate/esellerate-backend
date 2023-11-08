@@ -2,8 +2,7 @@ import { DataTypes } from 'sequelize'
 import { sequelize } from '../database/database.js'
 
 // relations
-import Products from './Product.js'
-import MercadolibreApp from './MercadolibreApp.js'
+import MercadoLibreAuth from './MercadoLibreAuth.js'
 import UserType from './UserType.js'
 
 const User = sequelize.define('user', {
@@ -16,13 +15,9 @@ const User = sequelize.define('user', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  mercadolibre_client_id: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   username: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: DataTypes.STRING(20),
+    allowNull: true
   },
   email: {
     type: DataTypes.STRING,
@@ -33,11 +28,11 @@ const User = sequelize.define('user', {
     allowNull: false
   },
   first_name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(30),
     allowNull: false
   },
   last_name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(30),
     allowNull: false
   },
   photo_url: {
@@ -45,15 +40,13 @@ const User = sequelize.define('user', {
     allowNull: true
   }
 }, {
-  freezeTableName: true
+  freezeTableName: true,
+  timestamps: false
 })
 
 // Relations
-User.hasMany(Products, { foreignKey: 'user_id', sourceKey: 'id' })
-Products.belongsTo(User, { foreignKey: 'user_id', sourceKey: 'id' })
 UserType.hasMany(User, { foreignKey: 'user_type_id', sourceKey: 'id' })
 User.belongsTo(UserType, { foreignKey: 'user_type_id', sourceKey: 'id' })
-MercadolibreApp.hasMany(User, { foreignKey: 'mercadolibre_client_id', sourceKey: 'client_id' })
-User.belongsTo(MercadolibreApp, { foreignKey: 'mercadolibre_client_id', sourceKey: 'client_id' })
+User.hasOne(MercadoLibreAuth, { foreignKey: 'id', sourceKey: 'id' })
 
 export default User

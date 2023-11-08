@@ -2,20 +2,30 @@ import { Router } from 'express'
 
 // import controllers
 import {
-  getProfile,
+  getProfile as getMercadoLibreProfile,
   getMercadoLibreCategories,
   getMercadoLibreChildCategories,
   getMercadoLibrePostTypes,
   getMercadoLibreItems,
   getMercadoLibreUserProducts
 } from '../controllers/example.controller.js'
+
+import {
+  login,
+  logout,
+  register,
+  addNewMercadoLibreApp,
+  validateApp,
+  getProfile as getUserProfile
+} from '../controllers/user.controller.js'
+
 import {
   createMercadoLibrePublication,
   createMercadoLibrePublicationTest,
   closeMercadoLibrePublication,
   deleteMercadoLibrePublication
 } from '../controllers/publication.controller.js'
-import { login } from '../controllers/user.controller.js'
+
 import {
   createMercadoLibreAnswerByQuestionID,
   deleteMercadoLibreQuestion,
@@ -24,24 +34,41 @@ import {
   getMercadoLibreQuestionsFromItem
 } from '../controllers/questions.controller.js'
 
+// middlewares
+import { validateLogin, validateRegister } from '../validator/validators.js'
+import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
+import { getMercadoLibreToken } from '../middlewares/mercadolibre/getMercadoLibreToken.js'
+
 const router = Router()
 
 // mercado libre
-router.get('/mercado-libre/profile', getProfile)
+router.get('/mercado-libre/profile', checkCookieCredentials, getMercadoLibreProfile)
 router.get('/mercado-libre/categories', getMercadoLibreCategories)
 router.get('/mercado-libre/categories/:id', getMercadoLibreChildCategories)
 router.get('/mercado-libre/product-types', getMercadoLibrePostTypes)
 router.get('/mercado-libre/items', getMercadoLibreItems)
+router.get('/mercado-libre/product', checkCookieCredentials, getMercadoLibreUserProducts)
 router.get('/mercado-libre/product', getMercadoLibreUserProducts)
 
-//publicaciones
+// publicaciones
 router.get('/mercado-libre/publish', createMercadoLibrePublication)
 router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
 router.get('/mercado-libre/close', closeMercadoLibrePublication)
 router.get('/mercado-libre/delete', deleteMercadoLibrePublication)
 
-//preguntas
-router.get('/mercado-libre/questions_all', getMercadoLibreQuestionsAll)
+// user controller
+router.post('/login', validateLogin, login)
+router.post('/logout', checkCookieCredentials, logout)
+router.post('/register', validateRegister, register)
+router.post('/add-mercadolibre-app', checkCookieCredentials, addNewMercadoLibreApp)
+router.get('/validate-session', checkCookieCredentials, validateApp)
+router.get('/profile', checkCookieCredentials, getUserProfile)
+
+// preguntas
+router.get('/mercado-libre/questions_all',
+  checkCookieCredentials,
+  getMercadoLibreToken,
+  getMercadoLibreQuestionsAll)
 router.post('/mercado-libre/questions_from_item', getMercadoLibreQuestionsFromItem)
 router.post('/mercado-libre/question_by_id', getMercadoLibreQuestion)
 router.post('/mercado-libre/question_delete', deleteMercadoLibreQuestion)

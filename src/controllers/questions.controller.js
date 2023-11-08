@@ -1,13 +1,14 @@
 // repositories
-import { 
+import {
   getQuestionsAll,
   getQuestionsFromItem,
   getQuestion,
   deleteQuestion,
-  createAnswerByQuestionID } from '../repositories/questions.js'
+  createAnswerByQuestionID
+} from '../repositories/questions.js'
 
 export const getMercadoLibreQuestionsAll = async (req, res) => {
-  const response = await getQuestionsAll()
+  const response = await getQuestionsAll(req.token)
   res.status(response.status)
   res.json(response)
 }
