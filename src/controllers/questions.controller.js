@@ -32,7 +32,7 @@ export const deleteMercadoLibreQuestion = async (req, res) => {
 }
 
 export const createMercadoLibreAnswerByQuestionID = async (req, res) => {
-  const response = await createAnswerByQuestionID(req.body)
+  const response = await createAnswerByQuestionID(req)
   res.status(response.status)
   res.json(response)
 }

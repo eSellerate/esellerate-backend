@@ -73,16 +73,17 @@ export const deleteQuestion = async (QUESTION_ID) => {
   }
 }
 
-export const createAnswerByQuestionID = async (data) => {
+export const createAnswerByQuestionID = async (req) => {
+  console.log(req.body)
   try {
     const url = baseUrl + '/answers/'
     const options = {
       headers: {
-        Authorization: process.env.TOKEN,
+        Authorization: `Bearer ${req.token}`,
         'Content-Type': 'application/json'
       }
     }
-    const response = await axios.post(url, data, options)
+    const response = await axios.post(url, req.body, options)
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
