@@ -14,7 +14,7 @@ app.use(cookieParser())
 
 // cors middleware
 app.use(cors({
-  origin: ['http://127.0.0.1:5173'],
+  origin: ['http://localhost:5173'],
   credentials: true,
   exposedHeaders: ['Cookie']
 }))
