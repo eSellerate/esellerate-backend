@@ -4,6 +4,7 @@ import 'dotenv/config'
 
 // repository
 import { getUserInfo } from './user.js'
+import { response } from 'express'
 
 const baseUrl = 'https://api.mercadolibre.com'
 
@@ -57,6 +58,19 @@ export const getUserProducts = async (productID) => {
   try {
     const response = await axios.get(baseUrl + `/items/${productID}`)
     return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const predictCategory = async (query) => {
+  try {
+    const response = await axios.get(baseUrl + '/sites/MLM/domain_discovery/search',
+      {
+        params: query
+      }
+    )
+    return response
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
   }
