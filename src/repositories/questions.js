@@ -33,7 +33,7 @@ export const getQuestionsFromItem = async (data) => {
     url = url + '&api_version=4'
     const options = {
       headers: {
-        Authorization: process.env.TOKEN
+        Authorization: `Bearer ${data.token}`
       }
     }
     const response = await axios.get(url, options)
@@ -43,12 +43,12 @@ export const getQuestionsFromItem = async (data) => {
   }
 }
 
-export const getQuestion = async (QUESTION_ID) => {
+export const getQuestion = async (data) => {
   try {
-    const url = baseUrl + `/questions/${QUESTION_ID}?api_version=4`
+    const url = baseUrl + `/questions/${data.QUESTION_ID}?api_version=4`
     const options = {
       headers: {
-        Authorization: process.env.TOKEN
+        Authorization: `Bearer ${data.token}`
       }
     }
     const response = await axios.get(url, options)
@@ -58,12 +58,12 @@ export const getQuestion = async (QUESTION_ID) => {
   }
 }
 
-export const deleteQuestion = async (QUESTION_ID) => {
+export const deleteQuestion = async (req) => {
   try {
-    const url = baseUrl + `/questions/${QUESTION_ID}`
+    const url = baseUrl + `/questions/${req.body.question_id}`
     const options = {
       headers: {
-        Authorization: process.env.TOKEN
+        Authorization: `Bearer ${req.token}`
       }
     }
     const response = await axios.delete(url, options)
