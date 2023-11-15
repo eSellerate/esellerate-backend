@@ -70,7 +70,10 @@ router.get('/mercado-libre/questions_all',
   getMercadoLibreToken,
   getMercadoLibreQuestionsAll)
 router.post('/mercado-libre/questions_from_item', getMercadoLibreQuestionsFromItem)
-router.post('/mercado-libre/question_by_id', getMercadoLibreQuestion)
+router.post('/mercado-libre/question_by_id',
+  checkCookieCredentials,
+  getMercadoLibreToken,
+  getMercadoLibreQuestion)
 router.post('/mercado-libre/question_delete',
   checkCookieCredentials,
   getMercadoLibreToken,
