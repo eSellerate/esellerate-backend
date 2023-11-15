@@ -2,6 +2,7 @@ import axios from 'axios'
 import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
 
 import 'dotenv/config'
+import { getMercadoLibreSellerIDFromToken } from './questions.js'
 
 const baseUrl = 'https://api.mercadolibre.com'
 
