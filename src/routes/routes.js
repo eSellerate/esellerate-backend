@@ -16,7 +16,8 @@ import {
   register,
   addNewMercadoLibreApp,
   validateApp,
-  getProfile as getUserProfile
+  getProfile as getUserProfile,
+  uploadImage
 } from '../controllers/user.controller.js'
 
 import {
@@ -55,7 +56,7 @@ router.get('/mercado-libre/product', getMercadoLibreUserProducts)
 router.get('/mercado-libre/predict-category', domainDiscovery)
 
 // publicaciones
-router.get('/mercado-libre/publish', createMercadoLibrePublication)
+router.post('/mercado-libre/publish', checkCookieCredentials, getMercadoLibreToken, createMercadoLibrePublication)
 router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
 router.get('/mercado-libre/close', closeMercadoLibrePublication)
 router.get('/mercado-libre/delete', deleteMercadoLibrePublication)
@@ -67,6 +68,7 @@ router.post('/register', validateRegister, register)
 router.post('/add-mercadolibre-app', checkCookieCredentials, addNewMercadoLibreApp)
 router.get('/validate-session', checkCookieCredentials, validateApp)
 router.get('/profile', checkCookieCredentials, getUserProfile)
+router.post('/upload-image', uploadImage)
 
 // preguntas
 router.get('/mercado-libre/questions_all',

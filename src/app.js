@@ -5,10 +5,22 @@ import { sequelize } from './database/database.js'
 import session from 'express-session'
 import SequelizeStore from 'connect-session-sequelize'
 import cookieParser from 'cookie-parser'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+import path from 'node:path'
+import multipart from 'connect-multiparty'
 import 'dotenv/config'
 // import router from './routes/routes.js'
 
 const app = express()
+
+// multiparty
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const storeImagesPath = path.join(__dirname, 'public', 'uploads')
+app.use(multipart({ uploadDir: storeImagesPath }))
+
+// static files
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(cookieParser())
 
