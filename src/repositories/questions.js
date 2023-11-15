@@ -5,10 +5,15 @@ import 'dotenv/config'
 
 const baseUrl = 'https://api.mercadolibre.com'
 
+export const getMercadoLibreSellerIDFromToken = (token) => {
+  return /[^-]*$/.exec(token)[0];
+}
+
 export const getQuestionsAll = async (token) => {
   try {
-    const url = baseUrl + '/questions/search?seller_id=' + process.env.SELLER_ID +
-            '&sort_fields=date_created,item_id&api_version=4'
+    const seller_id = getMercadoLibreSellerIDFromToken(token)
+    var url = baseUrl + '/questions/search?seller_id=' + seller_id
+    url = url + '&sort_fields=date_created,item_id&api_version=4'
     const options = {
       headers: {
         Authorization: `Bearer ${token}`
@@ -21,19 +26,19 @@ export const getQuestionsAll = async (token) => {
   }
 }
 
-export const getQuestionsFromItem = async (data) => {
+export const getQuestionsFromItem = async (req) => {
   try {
-    const url = baseUrl + `/questions/search?item=${data.itemID}`
-    if (data.hasOwnProperty('sort_fields')) {
-      url = url + data.sort_fields
+    const url = baseUrl + `/questions/search?item=${req.body.item_id}`
+    if (req.body.hasOwnProperty('sort_fields')) {
+      url = url + req.body.sort_fields
     }
-    if (data.hasOwnProperty('sort_types')) {
-      url = url + data.sort_types
+    if (req.body.hasOwnProperty('sort_types')) {
+      url = url + req.body.sort_types
     }
     url = url + '&api_version=4'
     const options = {
       headers: {
-        Authorization: `Bearer ${data.token}`
+        Authorization: `Bearer ${req.token}`
       }
     }
     const response = await axios.get(url, options)
@@ -43,12 +48,12 @@ export const getQuestionsFromItem = async (data) => {
   }
 }
 
-export const getQuestion = async (data) => {
+export const getQuestion = async (req) => {
   try {
-    const url = baseUrl + `/questions/${data.QUESTION_ID}?api_version=4`
+    const url = baseUrl + `/questions/${req.body.question_id}?api_version=4`
     const options = {
       headers: {
-        Authorization: `Bearer ${data.token}`
+        Authorization: `Bearer ${req.token}`
       }
     }
     const response = await axios.get(url, options)

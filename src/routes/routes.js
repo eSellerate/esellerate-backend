@@ -41,6 +41,7 @@ import { domainDiscovery } from '../controllers/product.controller.js'
 import { validateLogin, validateRegister } from '../validator/validators.js'
 import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
 import { getMercadoLibreToken } from '../middlewares/mercadolibre/getMercadoLibreToken.js'
+import { getMercadoLibreOrder, getMercadoLibreOrderBySearch, getMercadoLibreOrderProducts, getMercadoLibreOrdersAll, getMercadoLibreOrdersArchived, getMercadoLibreOrdersPending, getMercadoLibreOrdersRecent } from '../controllers/orders.controller.js'
 
 const router = Router()
 
@@ -75,7 +76,10 @@ router.get('/mercado-libre/questions_all',
   getMercadoLibreToken,
   getMercadoLibreQuestionsAll)
 router.post('/mercado-libre/questions_from_item', getMercadoLibreQuestionsFromItem)
-router.post('/mercado-libre/question_by_id', getMercadoLibreQuestion)
+router.post('/mercado-libre/question_by_id',
+  checkCookieCredentials,
+  getMercadoLibreToken,
+  getMercadoLibreQuestion)
 router.post('/mercado-libre/question_delete',
   checkCookieCredentials,
   getMercadoLibreToken,
@@ -84,6 +88,22 @@ router.post('/mercado-libre/question_answer',
   checkCookieCredentials,
   getMercadoLibreToken,
   createMercadoLibreAnswerByQuestionID)
+
+// orders (ventas)
+router.get('/mercado-libre/orders_all',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersAll)
+router.get('/mercado-libre/order_by_id',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrder)
+router.get('/mercado-libre/order_products_by_id',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrderProducts)
+router.get('/mercado-libre/orders_by_search',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrderBySearch)
+router.get('/mercado-libre/orders_recent',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersRecent)
+router.get('/mercado-libre/orders_archived',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersArchived)
+router.get('/mercado-libre/orders_pending',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersPending)
 
 // user controller todo
 router.post('/login', login)
