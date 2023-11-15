@@ -34,6 +34,8 @@ import {
   getMercadoLibreQuestionsFromItem
 } from '../controllers/questions.controller.js'
 
+import { domainDiscovery } from '../controllers/product.controller.js'
+
 // middlewares
 import { validateLogin, validateRegister } from '../validator/validators.js'
 import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
@@ -49,6 +51,7 @@ router.get('/mercado-libre/product-types', getMercadoLibrePostTypes)
 router.get('/mercado-libre/items', getMercadoLibreItems)
 router.get('/mercado-libre/product', checkCookieCredentials, getMercadoLibreUserProducts)
 router.get('/mercado-libre/product', getMercadoLibreUserProducts)
+router.get('/mercado-libre/predict-category', domainDiscovery)
 
 // publicaciones
 router.get('/mercado-libre/publish', createMercadoLibrePublication)
