@@ -7,7 +7,8 @@ import {
   getMercadoLibreChildCategories,
   getMercadoLibrePostTypes,
   getMercadoLibreItems,
-  getMercadoLibreUserProducts
+  getMercadoLibreUserProducts,
+  getMercadoLibreProductByID
 } from '../controllers/example.controller.js'
 
 import {
@@ -53,6 +54,7 @@ router.get('/mercado-libre/product-types', getMercadoLibrePostTypes)
 router.get('/mercado-libre/items', getMercadoLibreItems)
 router.get('/mercado-libre/product', checkCookieCredentials, getMercadoLibreUserProducts)
 router.get('/mercado-libre/product', getMercadoLibreUserProducts)
+router.get('/mercado-libre/product_by_id', checkCookieCredentials, getMercadoLibreProductByID)
 router.get('/mercado-libre/predict-category', domainDiscovery)
 
 // publicaciones

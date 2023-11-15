@@ -99,6 +99,21 @@ export const getMercadoLibreUserProducts = async (req, res) => {
   res.json(products)
 }
 
+export const getMercadoLibreProductByID = async (req, res) => {
+  // get user
+  const user = req.user
+  const mercadolibreValues = await GetMercadoLibreAuthValues(user.id)
+  if (!mercadolibreValues) {
+    res.status(404).json({
+      message: 'El usuaro no tiene una cuenta de Mercado Libre asociada'
+    })
+    return
+  }
+  const product = await getUserProducts(req.query.product_id)
+  res.status(200)
+  res.json(product)
+}
+
 export const refreshTokenMercadoLibre = async (req, res) => {
   const { clientId, clientSecret, refreshToken } = req.body
   try {
