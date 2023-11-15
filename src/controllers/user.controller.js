@@ -12,6 +12,8 @@ import {
 } from '../repositories/user.js'
 // middleware
 import checkValidations from '../validator/checkValidations.js'
+import path from 'node:path'
+import 'dotenv/config'
 
 export const login = async (req, res) => {
   // validate request data
@@ -262,5 +264,24 @@ export const getProfile = async (req, res) => {
   })
   res.status(200).json({
     user
+  })
+}
+
+export const uploadImage = (req, res) => {
+  const { files } = req.files
+  if (!files) {
+    res.status(400).json({
+      message: 'No se subio la imágen'
+    })
+    return
+  }
+  const paths = []
+  files.forEach(data => {
+    const p = path.parse(data.path).base
+    paths.push(process.env.SERVER_NAME + p)
+  })
+  res.status(200).json({
+    message: 'imagen(es) guardada(s).',
+    images: paths
   })
 }

@@ -10,10 +10,10 @@ export const createPublication = async (publicationData) => {
     const url = baseUrl + '/items'
     const options = {
       headers: {
-        Authorization: process.env.TOKEN,
-      },
+        Authorization: `Bearer ${publicationData.token}`
+      }
     }
-    const response = await axios.post(url, publicationData, options)
+    const response = await axios.post(url, publicationData.body, options)
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
