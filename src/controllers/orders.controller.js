@@ -6,7 +6,7 @@ import {
     getOrdersArchived, 
     getOrdersPending, 
     getOrdersRecent 
-} from "../repositories/orders"
+} from "../repositories/orders.js"
 
 export const getMercadoLibreOrdersAll = async (req, res) => {
     const response = await getOrdersAll(req.token)
