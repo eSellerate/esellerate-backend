@@ -37,6 +37,7 @@ import {
 
 import { domainDiscovery } from '../controllers/product.controller.js'
 
+import { generateSaleOrder } from '../controllers/pdf.controller.js'
 // middlewares
 import { validateLogin, validateRegister } from '../validator/validators.js'
 import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
@@ -107,5 +108,6 @@ router.get('/mercado-libre/orders_pending',
 
 // user controller todo
 router.post('/login', login)
+router.get('/generate-order', checkCookieCredentials, getMercadoLibreToken, generateSaleOrder)
 
 export default router

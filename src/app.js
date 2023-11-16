@@ -15,8 +15,8 @@ import 'dotenv/config'
 const app = express()
 
 // multiparty
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const storeImagesPath = path.join(__dirname, 'public', 'uploads')
+global.__dirname = dirname(fileURLToPath(import.meta.url))
+const storeImagesPath = path.join(global.__dirname, 'public', 'uploads')
 app.use(multipart({ uploadDir: storeImagesPath }))
 
 // static files
