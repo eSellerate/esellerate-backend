@@ -110,6 +110,6 @@ router.get('/mercado-libre/orders_pending',
 
 // user controller todo
 router.post('/login', login)
-router.get('/generate-order', checkCookieCredentials, getMercadoLibreToken, generateSaleOrder)
+router.post('/generate-order', checkCookieCredentials, getMercadoLibreToken, generateSaleOrder)
 
 export default router
