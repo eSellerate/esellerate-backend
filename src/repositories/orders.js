@@ -80,6 +80,7 @@ export const getOrdersAll = async (token) => {
     for (let i = 0; i < nodes.length; i++) {
       var product = await getUserProducts(response.data.results[i].order_items[0].item.id)
       response.data.results[i].order_items[0].item.image = product.data.pictures[0].url
+      response.data.results[i].enabled = true
     }
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
