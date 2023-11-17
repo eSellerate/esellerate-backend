@@ -2,7 +2,7 @@
 // model
 import User from '../models/User.js'
 import MercadolibreAuth from '../models/MercadoLibreAuth.js'
-import MercadolibreApp from '../models/MercadoLibreApp.js'
+import MercadolibreApp from '../models/MercadolibreApp.js'
 
 /**
  * retrieves the MercadoLibre values from specified user

@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize'
 import { sequelize } from '../database/database.js'
-import DbOptions from './dbOption.js'
+import DbOptions from './DbOptions.js'
 
 const MercadolibreApp = sequelize.define('mercadolibre_app', {
   client_id: {
