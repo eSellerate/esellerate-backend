@@ -81,28 +81,30 @@ export const createPublicationTest = async () => {
   }
 }
 
-export const closePublication = async (productID) => {
+export const closePublication = async (req) => {
   try {
+    const { id } = req.query
     const options = {
       headers: {
-        Authorization: process.env.TOKEN
+        Authorization: req.token
       }
     }
     const data = {
       status: 'closed'
     }
-    const response = await axios.put(baseUrl + `/items/${productID}`, data, options)
+    const response = await axios.put(baseUrl + `/items/${id}`, data, options)
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
   }
 }
 
-export const deletePublication = async (productID) => {
+export const deletePublication = async (req) => {
   try {
+    const { id } = req.query
     const options = {
       headers: {
-        Authorization: process.env.TOKEN,
+        Authorization: req.token,
       },
     }
     const dataClose = {
@@ -111,25 +113,25 @@ export const deletePublication = async (productID) => {
     const dataDelete = {
       deleted: 'true'
     }
-    const responseUnused = await axios.put(baseUrl + `/items/${productID}`, dataClose, options)
-    const response = await axios.put(baseUrl + `/items/${productID}`, dataDelete, options)
+    const responseUnused = await axios.put(baseUrl + `/items/${id}`, dataClose, options)
+    const response = await axios.put(baseUrl + `/items/${id}`, dataDelete, options)
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
   }
 }
 
-export const modifyPublication = async (data) => {
+export const modifyPublication = async (req) => {
   try {
     const options = {
       headers: {
-        Authorization: process.env.TOKEN,
+        Authorization: req.token,
       },
     }
     const data = {
       deleted: 'true'
     }
-    const response = await axios.put(baseUrl + `/items/${productID}`, data, options)
+    const response = await axios.put(baseUrl + `/items/${req.body.id}`, data, options)
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
