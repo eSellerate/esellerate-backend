@@ -4,6 +4,7 @@ from xml.etree.ElementTree import Element
 from flask import Flask
 from flask import request
 from flask import send_file
+import numpy as np
 
 os.chdir(os.curdir+"/src/image_processing")
 
@@ -21,6 +22,8 @@ class SVGTree:
         self.tree = ET.parse(svgfile)
         self.root = self.tree.getroot()
         self.style = self.tree.find('style', namespaces)
+        self.viewBox = np.asarray(
+            self.root.attrib['viewBox'].split(' '), dtype=float )
 
     def print_from_root(self):
         for child in self.root[1:]:
@@ -29,18 +32,27 @@ class SVGTree:
     def insert_on_id(self, svg2, id):
         insert = self.root.find(".//*[@id='"+id+"']")
         starting_number = 0
-        if(svg2.style):
+        print(svg2.style)
+        if(svg2.style is not None):
+            print("ayudame gfsita")
             self.style.text = self.style.text + svg2.style.text
             starting_number = starting_number + 1
         for child in svg2.root[starting_number:]:
+            print(child)
             insert.append(child)
         self.tree.write("output.svg")
 
     def insert_text(self, text):
+        x = self.viewBox[2]
+        y = self.viewBox[3]
+        STYLE_BORDERED_TEXT = """
+            text {
+            font: """+str(y/5)+"""px bold sans-serif; stroke-linejoin: round;
+            text-anchor: middle; fill: white; stroke: black;
+            }"""
+        self.style.text = self.style.text + STYLE_BORDERED_TEXT
         insert = self.root
-        textcss = '.name-text {font-size:  18px; paint-order: stroke; stroke: #000000; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; font-weight: 800}'
-        self.style.text = self.style.text + textcss
-        insert.append((ET.fromstring('<text x="50" y="50" style="stroke-width: 12px; paint-order: stroke;">'+text+'</text>')))
+        insert.append((ET.fromstring('<text x="50.5%" y="58%" style="stroke-width: 4.5px; paint-order: stroke;">'+text+'</text>')))
         self.tree.write("output.svg")
 
 app = Flask(__name__)
@@ -50,7 +62,7 @@ def generate():
     svg1 = SVGTree(request.args.get('template'))
     svg2 = SVGTree(request.args.get('background'))
     svg1.insert_on_id(svg2, "replace")
-    svg1.insert_text("Rocko")
+    svg1.insert_text("pizzazz")
     return send_file('output.svg')
 
 #svg1 = SVGTree('mask_bone_big.svg')
