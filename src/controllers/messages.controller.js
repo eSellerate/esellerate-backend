@@ -4,7 +4,7 @@ import {
     getMessageMotives,
     getMessages,
     sendMessage
-} from "../repositories/messages"
+} from "../repositories/messages.js"
 
 export const getMercadoLibreMessageMotives = async (req, res) => {
     const response = await getMessageMotives(req.token, req.query)
