@@ -27,7 +27,10 @@ export async function generateSaleOrder (req, res) {
     total
   }
   const html = template(hbData)
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({
+    executablePath: '/snap/bin/chromium',
+    args: ['--no-sandbox']
+  })
   const page = await browser.newPage()
   await page.setContent(html)
   await page.pdf({

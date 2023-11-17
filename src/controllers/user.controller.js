@@ -3,7 +3,7 @@
 import User from '../models/User.js'
 import UserType from '../models/UserType.js'
 import MercadoLibreAuth from '../models/MercadoLibreAuth.js'
-import MercadoLibreApp from '../models/MercadoLibreApp.js'
+import MercadoLibreApp from '../models/MercadolibreApp.js'
 
 // repositories
 import {
