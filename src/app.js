@@ -10,6 +10,8 @@ import { dirname } from 'path'
 import path from 'node:path'
 import multipart from 'connect-multiparty'
 import 'dotenv/config'
+import schedule from 'node-schedule'
+import { automaticMessages } from './automatization.js'
 // import router from './routes/routes.js'
 
 const app = express()
@@ -58,5 +60,11 @@ app.use('/api/v1', router)
 
 // routes
 app.use(router)
+
+//1 es el intervalo de minutos en los que se ejecuta
+const job = schedule.scheduleJob("*/10 * * * * *", function(){
+  console.log('Esto es una prueba!');
+  automaticMessages()
+});
 
 export default app
