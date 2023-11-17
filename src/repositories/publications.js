@@ -81,12 +81,11 @@ export const createPublicationTest = async () => {
   }
 }
 
-export const closePublication = async (req) => {
+export const closePublication = async (token, id) => {
   try {
-    const { id } = req.query
     const options = {
       headers: {
-        Authorization: req.token
+        Authorization: token
       }
     }
     const data = {
@@ -99,12 +98,11 @@ export const closePublication = async (req) => {
   }
 }
 
-export const deletePublication = async (req) => {
+export const deletePublication = async (token, id) => {
   try {
-    const { id } = req.query
     const options = {
       headers: {
-        Authorization: req.token,
+        Authorization: token,
       },
     }
     const dataClose = {
@@ -113,7 +111,7 @@ export const deletePublication = async (req) => {
     const dataDelete = {
       deleted: 'true'
     }
-    const responseUnused = await axios.put(baseUrl + `/items/${id}`, dataClose, options)
+    await axios.put(baseUrl + `/items/${id}`, dataClose, options)
     const response = await axios.put(baseUrl + `/items/${id}`, dataDelete, options)
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
