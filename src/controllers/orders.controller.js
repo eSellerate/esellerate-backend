@@ -4,6 +4,7 @@ import {
     getOrderProducts, 
     getOrdersAll, 
     getOrdersArchived, 
+    getOrdersByAnyID, 
     getOrdersPending, 
     getOrdersRecent 
 } from "../repositories/orders.js"
@@ -16,7 +17,7 @@ export const getMercadoLibreOrdersAll = async (req, res) => {
 
 export const getMercadoLibreOrder = async (req, res) => {
     const { id } = req.query
-    const response = await getOrder(req.token, id)
+    const response = await getOrdersByAnyID(req.token, id)
     res.status(response.status)
     res.json(response)
 }

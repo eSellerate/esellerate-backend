@@ -20,6 +20,48 @@ export const getOrder = async (token, order_id) => {
   }
 }
 
+export const getOrdersByPackID = async (token, pack_id) => {
+  try {
+    const url = baseUrl + `/packs/${pack_id}`
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    const response = await axios.get(url, options)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const getOrdersByAnyID = async (token, id) => {
+  try {
+    const seller_id = getMercadoLibreSellerIDFromToken(token)
+    const url = baseUrl + `/orders/search?seller=${seller_id}&q=${id}`
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    let response = await axios.get(url, options)
+    if(response.data.results.length === 0){
+      response = await getOrdersByPackID(token, id)
+      let orders = []
+      let nodes = Object.keys(response.data.orders);
+      for (let i = 0; i < nodes.length; i++) {
+        let order = await getOrder(token, response.data.orders[i].id)
+        orders.push(order.data)
+      }
+      response.data = orders
+    }
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    console.log(error)
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
 export const getOrderProducts = async (req) => {
   try {
     const url = baseUrl + `/orders/${req.body.order_id}/product`
@@ -50,7 +92,6 @@ export const getOrderBySearch = async (req) => {
         url = url + "&" + field + "=" + req.body[field]
       }
     });
-    console.log(url)
     const options = {
       headers: {
         Authorization: `Bearer ${req.token}`
