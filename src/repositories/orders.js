@@ -5,12 +5,12 @@ import 'dotenv/config'
 import { getMercadoLibreSellerIDFromToken, baseUrl } from '../utilities/Utilities.js'
 import { getUserProducts } from './products.js'
 
-export const getOrder = async (req) => {
+export const getOrder = async (token, order_id) => {
   try {
-    const url = baseUrl + `/orders/${req.body.order_id}`
+    const url = baseUrl + `/orders/${order_id}`
     const options = {
       headers: {
-        Authorization: `Bearer ${req.token}`
+        Authorization: `Bearer ${token}`
       }
     }
     const response = await axios.get(url, options)

@@ -15,7 +15,8 @@ export const getMercadoLibreOrdersAll = async (req, res) => {
 }
 
 export const getMercadoLibreOrder = async (req, res) => {
-    const response = await getOrder(req)
+    const { id } = req.query
+    const response = await getOrder(req.token, id)
     res.status(response.status)
     res.json(response)
 }
