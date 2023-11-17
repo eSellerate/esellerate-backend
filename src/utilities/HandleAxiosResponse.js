@@ -1,7 +1,13 @@
 export default class HandleAxiosResponse {
   static handleError (error) {
-    const { data } = error.response
-    return data
+    console.trace()
+    if(error.response){
+      const { data } = error.response
+      console.log(data)
+      return data
+    }
+    console.log(error)
+    return error
   }
 
   static handleSuccess (success) {

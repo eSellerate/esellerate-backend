@@ -88,13 +88,31 @@ export const getOrderBySearch = async (req) => {
     const seller_id = getMercadoLibreSellerIDFromToken(req.token)
     var url = baseUrl + `/orders/search?seller=` + seller_id
     search_fields.forEach(field => {
-      if (req.body.hasOwnProperty(field)) {
+      if (req.query[field]) {
         url = url + "&" + field + "=" + req.body[field]
       }
     });
     const options = {
       headers: {
         Authorization: `Bearer ${req.token}`
+      }
+    }
+    const response = await axios.get(url, options)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const getOrdersByDateRange = async (token, date_from) => {
+  try {
+    const seller_id = getMercadoLibreSellerIDFromToken(token)
+    const url = baseUrl + `/orders/search?seller=${seller_id}`
+      + `&order.date_created.from=${date_from.toISOString().split('T')[0]}T00:00:00.000-00:00`
+    //  + `&order.date_created.to=2015-07-31T00:00:00.000-00:00`
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
     }
     const response = await axios.get(url, options)

@@ -3,17 +3,20 @@ import {
     getMessageByMessageID,
     getMessageMotives,
     getMessages,
+    getPackID,
     sendMessage
 } from "../repositories/messages.js"
 
 export const getMercadoLibreMessageMotives = async (req, res) => {
-    const response = await getMessageMotives(req.token, req.query)
+    const pack_id = getPackID(req.token, req.query)
+    const response = await getMessageMotives(req.token, pack_id)
     res.status(response.status)
     res.json(response)
 }
 
 export const getMercadoLibreMessages = async (req, res) => {
-    const response = await getMessages(req.token, req.query)
+    const pack_id = getPackID(req.token, req.query)
+    const response = await getMessages(req.token, pack_id)
     res.status(response.status)
     res.json(response)
 }
@@ -26,7 +29,8 @@ export const getMercadoLibreMessageByMessageID = async (req, res) => {
 }
 
 export const sendMercadoLibreMessage = async (req, res) => {
-    const response = await sendMessage(req)
+    const pack_id = getPackID(token, req.body)
+    const response = await sendMessage(req.token, pack_id, req.body.client_id, req.body.text, req.body.attachments)
     res.status(response.status)
     res.json(response)
 }

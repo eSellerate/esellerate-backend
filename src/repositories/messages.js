@@ -5,7 +5,7 @@ import 'dotenv/config'
 import { baseUrl, getMercadoLibreSellerIDFromToken } from '../utilities/Utilities.js'
 import { getOrder } from './orders.js'
 
-const getPackID = async (token, query) => {
+export const getPackID = async (token, query) => {
     let pack_id = query.pack_id
     if (!pack_id) {
         let order = await getOrder(token, query.order_id)
@@ -16,9 +16,8 @@ const getPackID = async (token, query) => {
     return pack_id
 }
 
-export const getMessageMotives = async (token, query) => {
+export const getMessageMotives = async (token, pack_id) => {
     try {
-        const pack_id = getPackID(token, query)
         const url = baseUrl + `/messages/action_guide/packs/${pack_id}/caps_available?tag=post_sale`
         const options = {
             headers: {
@@ -32,11 +31,10 @@ export const getMessageMotives = async (token, query) => {
     }
 }
 
-export const getMessages = async (token, query) => {
+export const getMessages = async (token, pack_id) => {
     try {
         const seller_id = getMercadoLibreSellerIDFromToken(token)
-        const pack_id = getPackID(token, query)
-        const url = baseUrl + `/messages/action_guide/packs/${pack_id}/sellers/${seller_id}?tag=post_sale`
+        const url = baseUrl + `/messages/packs/${pack_id}/sellers/${seller_id}?tag=post_sale`
         const options = {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -88,27 +86,48 @@ const processAttachments = async (attachments, token) => {
     return attachments_ids
 }
 
-export const sendMessage = async (req) => {
+export const sendMessage = async (token, pack_id, client_id, text, attachments) => {
     try {
-        const attachments_ids = processAttachments(req.body.attachments, req.token)
-        const seller_id = getMercadoLibreSellerIDFromToken(req.token)
-        const pack_id = getPackID(token, req.body)
+        let attachments_ids = []
+        if(attachments !== null)
+            attachments_ids = processAttachments(attachments, token)
+        const seller_id = getMercadoLibreSellerIDFromToken(token)
+        //const pack_id = getPackID(token, req.body)
         const url = baseUrl + `/messages/packs/${pack_id}/sellers/${seller_id}?tag=post_sale`
         const options = {
             headers: {
-                Authorization: `Bearer ${req.token}`
+                Authorization: `Bearer ${token}`
             }
         }
-        const body = req.body
+        //const body = req.body
         const requestData = {
             from: {
                 user_id: seller_id,
             },
             to: {
-                user_id: body.client_id
+                user_id: client_id
             },
-            text: body.text,
+            text: text,
             attachments: attachments_ids
+        };
+        const response = await axios.post(url, requestData, options)
+        return HandleAxiosResponse.handleSuccess(response)
+    } catch (error) {
+        return HandleAxiosResponse.handleError(error)
+    }
+}
+
+export const sendMessageMotiveOther = async (token, pack_id, text) => {
+    try {
+        const url = baseUrl + `/messages/action_guide/packs/${pack_id}/option`
+        const options = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        const requestData = {
+            option_id: "OTHER",
+            text: text
         };
         const response = await axios.post(url, requestData, options)
         return HandleAxiosResponse.handleSuccess(response)
@@ -120,6 +139,21 @@ export const sendMessage = async (req) => {
 export const getAttachment = async (token, id) =>{
     try {
         const url = baseUrl + `/messages/attachments/${id}?tag=post_sale&site_id=MLM`
+        const options = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        const response = await axios.get(url, options)
+        return HandleAxiosResponse.handleSuccess(response)
+    } catch (error) {
+        return HandleAxiosResponse.handleError(error)
+    }
+}
+
+export const getMessagesPendingAll = async (token) =>{
+    try {
+        const url = baseUrl + `/messages/unread?role=seller&tag=post_sale`
         const options = {
             headers: {
                 Authorization: `Bearer ${token}`
