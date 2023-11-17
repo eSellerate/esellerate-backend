@@ -43,7 +43,16 @@ import { generateSaleOrder } from '../controllers/pdf.controller.js'
 import { validateLogin, validateRegister } from '../validator/validators.js'
 import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
 import { getMercadoLibreToken } from '../middlewares/mercadolibre/getMercadoLibreToken.js'
-import { getMercadoLibreOrder, getMercadoLibreOrderBySearch, getMercadoLibreOrderProducts, getMercadoLibreOrdersAll, getMercadoLibreOrdersArchived, getMercadoLibreOrdersPending, getMercadoLibreOrdersRecent } from '../controllers/orders.controller.js'
+import { 
+  getMercadoLibreOrder, 
+  getMercadoLibreOrderBySearch, 
+  getMercadoLibreOrderProducts, 
+  getMercadoLibreOrdersAll, 
+  getMercadoLibreOrdersArchived, 
+  getMercadoLibreOrdersPending, 
+  getMercadoLibreOrdersRecent 
+} from '../controllers/orders.controller.js'
+import { getMercadoLibreMessageAttachment, getMercadoLibreMessageByMessageID, getMercadoLibreMessageMotives, getMercadoLibreMessages, sendMercadoLibreMessage } from '../controllers/messages.controller.js'
 
 const router = Router()
 
@@ -107,6 +116,18 @@ router.get('/mercado-libre/orders_archived',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersArchived)
 router.get('/mercado-libre/orders_pending',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersPending)
+
+// messages
+router.get('/mercado-libre/messages',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessages)
+router.get('/mercado-libre/message_motives',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessageMotives)
+router.get('/mercado-libre/message_by_id',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessageByMessageID)
+router.post('/mercado-libre/message_send',
+  checkCookieCredentials, getMercadoLibreToken, sendMercadoLibreMessage)
+router.get('/mercado-libre/message_attachment',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessageAttachment)
 
 // user controller todo
 router.post('/login', login)
