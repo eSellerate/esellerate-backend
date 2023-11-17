@@ -6,7 +6,7 @@ import 'dotenv/config'
 import { getUserInfo } from './user.js'
 import { response } from 'express'
 
-const baseUrl = 'https://api.mercadolibre.com'
+import { baseUrl } from '../utilities/Utilities.js'
 
 export const getCategories = async () => {
   try {

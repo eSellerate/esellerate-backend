@@ -3,7 +3,7 @@ import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
 
 import 'dotenv/config'
 
-const baseUrl = 'https://api.mercadolibre.com'
+import { baseUrl } from '../utilities/Utilities.js'
 
 export const createPublication = async (publicationData) => {
   try {

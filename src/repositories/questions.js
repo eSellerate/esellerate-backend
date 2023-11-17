@@ -1,13 +1,9 @@
 import axios from 'axios'
 import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
 
+import { getMercadoLibreSellerIDFromToken, baseUrl } from '../utilities/Utilities.js'
+
 import 'dotenv/config'
-
-const baseUrl = 'https://api.mercadolibre.com'
-
-export const getMercadoLibreSellerIDFromToken = (token) => {
-  return /[^-]*$/.exec(token)[0];
-}
 
 export const getQuestionsAll = async (token) => {
   try {

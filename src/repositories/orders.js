@@ -2,10 +2,8 @@ import axios from 'axios'
 import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
 
 import 'dotenv/config'
-import { getMercadoLibreSellerIDFromToken } from './questions.js'
+import { getMercadoLibreSellerIDFromToken, baseUrl } from '../utilities/Utilities.js'
 import { getUserProducts } from './products.js'
-
-const baseUrl = 'https://api.mercadolibre.com'
 
 export const getOrder = async (req) => {
   try {
