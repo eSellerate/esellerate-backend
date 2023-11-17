@@ -28,7 +28,8 @@ export async function generateSaleOrder (req, res) {
   }
   const html = template(hbData)
   const browser = await puppeteer.launch({
-    executablePath: '/snap/bin/chromium'
+    executablePath: '/snap/bin/chromium',
+    args: ['--no-sandbox']
   })
   const page = await browser.newPage()
   await page.setContent(html)
