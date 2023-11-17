@@ -4,7 +4,7 @@ const checkValidations = (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     res.status(400).json({
-      message: 'Ocurrió un error al valiadar los datos',
+      message: 'Ocurrió un error al validar los datos',
       errors: errors.array()
     })
     return true // Indicate that there were errors
