@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize'
 import { sequelize } from '../database/database.js'
 import DbOptions from './DbOptions.js'
 
-import MercadoLibreApp from './MercadoLibreApp.js'
+import MercadoLibreApp from './MercadolibreApp.js'
 
 const MercadoLibreAuth = sequelize.define('mercadolibre_auth', {
   id: {
