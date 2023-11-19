@@ -33,7 +33,12 @@ app.use(cors({
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://162.243.186.254:5173',
-    'http://162.243.186.254:5174'
+    'http://162.243.186.254:5174',
+    'http://esellerate.com.mx:5173',
+    'http://esellerate.com.mx',
+    'https://esellerate.com.mx',
+    'https://162.243.186.254:3000',
+    'https://esellerate.com.mx:5173'
   ],
   credentials: true,
   exposedHeaders: ['Cookie']
