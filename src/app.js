@@ -22,7 +22,7 @@ const storeImagesPath = path.join(global.__dirname, 'public', 'uploads')
 app.use(multipart({ uploadDir: storeImagesPath }))
 
 // static files
-console.log(global.dirname)
+console.log(global.__dirname)
 app.use(express.static(path.join(global.__dirname, 'public')))
 
 app.use(cookieParser())
