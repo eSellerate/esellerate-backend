@@ -32,13 +32,10 @@ class SVGTree:
     def insert_on_id(self, svg2, id):
         insert = self.root.find(".//*[@id='"+id+"']")
         starting_number = 0
-        print(svg2.style)
         if(svg2.style is not None):
-            print("ayudame gfsita")
             self.style.text = self.style.text + svg2.style.text
             starting_number = starting_number + 1
         for child in svg2.root[starting_number:]:
-            print(child)
             insert.append(child)
         self.tree.write("output.svg")
 
@@ -62,7 +59,7 @@ def generate():
     svg1 = SVGTree(request.args.get('template'))
     svg2 = SVGTree(request.args.get('background'))
     svg1.insert_on_id(svg2, "replace")
-    svg1.insert_text("pizzazz")
+    svg1.insert_text(request.args.get('name'))
     return send_file('output.svg')
 
 #svg1 = SVGTree('mask_bone_big.svg')
