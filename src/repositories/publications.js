@@ -20,12 +20,48 @@ export const createPublication = async (publicationData) => {
   }
 }
 
+export const editPublication = async (requestData, productId) => {
+  // update name and price
+  try {
+    const response = await axios.put(`https://api.mercadolibre.com/items/${productId}`, requestData.body, {
+      headers: {
+        Authorization: `Bearer ${requestData.token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    // console.log(response)
+    return response
+  } catch (error) {
+    // console.log(error.response.data)
+    return error
+  }
+}
+
+export const editPublicationDescription = async (request, productID) => {
+  // update description
+  try {
+    const response = await axios.put(`https://api.mercadolibre.com/items/${productID}/description`,
+      {
+        plain_text: request.body.description
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${request.token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+    return response
+  } catch (error) {
+    return error
+  }
+}
+
 export const createPublicationTest = async () => {
   try {
     const url = baseUrl + '/items'
     const data = {
-      title: "Muñeco MALO - No Ofertar",
-      category_id: "MLM455858",
+      title: 'Muñeco MALO - No Ofertar',
+      category_id: 'MLM455858',
       price: 230,
       currency_id: 'MXN',
       available_quantity: 10,
@@ -71,7 +107,7 @@ export const createPublicationTest = async () => {
     const options = {
       headers: {
         Authorization: process.env.TOKEN,
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       }
     }
     const response = await axios.post(url, data, options)
@@ -102,8 +138,8 @@ export const deletePublication = async (token, id) => {
   try {
     const options = {
       headers: {
-        Authorization: token,
-      },
+        Authorization: token
+      }
     }
     const dataClose = {
       status: 'closed'
@@ -123,8 +159,8 @@ export const modifyPublication = async (req) => {
   try {
     const options = {
       headers: {
-        Authorization: req.token,
-      },
+        Authorization: req.token
+      }
     }
     const data = {
       deleted: 'true'
