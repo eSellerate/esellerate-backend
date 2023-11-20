@@ -31,6 +31,7 @@ export async function generateSaleOrder (req, res) {
     executablePath: '/snap/bin/chromium',
     args: ['--no-sandbox']
   })
+  // const browser =await puppeteer.launch()
   const page = await browser.newPage()
   await page.setContent(html)
   await page.pdf({
