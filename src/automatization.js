@@ -5,6 +5,7 @@ todo es tu culpa amlo idiota
 
 import MercadoLibreAuth from './models/MercadoLibreAuth.js'
 import MercadoLibreApp from './models/MercadolibreApp.js'
+import Message from './models/message.js';
 import { getMessageMotives, getMessages, sendMessage, sendMessageMotiveOther } from './repositories/messages.js';
 import { getOrdersByDateRange, getOrdersPending, getOrdersRecent } from './repositories/orders.js';
 
@@ -13,24 +14,35 @@ import { getOrdersByDateRange, getOrdersPending, getOrdersRecent } from './repos
 var previousDate = new Date("2023-11-10");
 var defaultMessage = "Muchas gracias por su compra"
 
-async function processMessage(token, order, id, client_id) {
+async function processMessage(token, order, id, client_id, messages) {
+    let bFirstConversaton = true
+    if(messages.data.messages.length > 0){
+        bFirstConversaton = false
+    }
     let nodes = Object.keys(order.order_items);
-    let bDefaultMessage = true;
     for (let i = 0; i < nodes.length; i++) {
-        let item = order.order_items[i]
-        //revisar si el item esta en la base de datos con
-        //mensaje personalizado
-        if (false) {
-            bDefaultMessage = false
-            //sendMessage
+        let item = order.order_items[i].item
+        let storedMessages = await Message.findAll({
+            where: {
+                fk_product_id: item.id
+            }
+        })
+        let nodes = Object.keys(storedMessages);
+        for (let i = 0; i < nodes.length; i++) {
+            if(storedMessages[i].type == 1 && !bFirstConversaton)
+                continue;
+            let response = await sendMessage(token, id, client_id, storedMessages[i].text, null)
+            if (response.data === undefined) {
+                response = await sendMessageMotiveOther(token, id, storedMessages[i].text)
+            }
         }
     }
-    if (bDefaultMessage) {
+    /*
         let response = await sendMessage(token, id, client_id, defaultMessage, null)
         if (response.data === undefined) {
             response = await sendMessageMotiveOther(token, id, defaultMessage)
         }
-    }
+    */
 }
 
 async function processOrder(token, order) {
@@ -44,23 +56,23 @@ async function processOrder(token, order) {
     //console.log(messages.data.messages)
     let motives = await getMessageMotives(token, id)
     //console.log(motives.data)
-    let bProcessMessage = true
+    if (messages.data.messages.length > 0) {
+        let message_moderation = messages.data.messages[0].message_moderation
+        if (message_moderation.code === 'forbidden' ||
+            message_moderation.code === 'rejected' ||
+            message_moderation.code === 'automatic_message')
+            return
+    }
+    if (motives.status_code != null) {
+        if (motives.code === 'blocked_by_excepted_case') {
+            processMessage(token, order, id, client_id, messages)
+            return
+        }
+    }
     if (motives.data) {
         let found = motives.data.filter(function (item) { return item.option_id === 'OTHER'; });
         if (found[0].cap_available === 0)
-            bProcessMessage = false
-    }
-    if (messages.data.messages.length > 0) {
-        bProcessMessage = false
-        let message_moderation = messages.data.messages[0].message_moderation
-        if (message_moderation.status == ! 'rejected'
-            && message_moderation.reason == ! 'automatic_message')
-            bProcessMessage = true
-        if (message_moderation.code === 'forbidden')
-            bProcessMessage = false
-    }
-    if (bProcessMessage) {
-        processMessage(token, order, id, client_id)
+            return
     }
 }
 

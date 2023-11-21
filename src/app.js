@@ -70,7 +70,7 @@ app.use('/api/v1', router)
 app.use(router)
 
 //1 es el intervalo de minutos en los que se ejecuta
-const job = schedule.scheduleJob("*/10 * * * *", function(){
+const job = schedule.scheduleJob("*/10 * * * * *", function(){
   console.log('Ejecutando Mensajes Automaticos!');
   automaticMessages(new Date())
 });

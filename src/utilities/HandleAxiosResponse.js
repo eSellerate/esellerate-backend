@@ -11,7 +11,6 @@ export default class HandleAxiosResponse {
   }
 
   static handleSuccess(success) {
-    console.trace()
     if (success.status) {
       const { status, data } = success
       return { status, data }

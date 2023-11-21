@@ -4,6 +4,31 @@ import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
 import 'dotenv/config'
 
 import { baseUrl } from '../utilities/Utilities.js'
+import Message from '../models/message.js'
+
+export const insertSingleMessage = async (productID, type, text) => {
+  await Message.create({
+    fk_product_id: productID,
+    type: Number(type),
+    text: text
+  })
+}
+
+export const insertMessages = async (productID, messages) => {
+  let nodes = Object.keys(messages);
+  for (let i = 0; i < nodes.length; i++) {
+    await insertSingleMessage(productID, messages[i].type, messages[i].text)
+  }
+}
+
+export const modifyMessages = async (productID, messages) => {
+  await Message.destroy({
+    where: {
+      fk_product_id: productID
+    }
+  })
+  await insertMessages(productID, messages)
+}
 
 export const createPublication = async (publicationData) => {
   try {
@@ -21,6 +46,8 @@ export const createPublication = async (publicationData) => {
     }
     const response = await axios.post(url, body, options)
     if (customMessages != null) {
+      console.log(customMessages)
+      insertMessages(response.data.id, customMessages)
     }
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
