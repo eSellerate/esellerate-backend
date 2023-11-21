@@ -4,7 +4,7 @@ import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
 import 'dotenv/config'
 
 import { baseUrl } from '../utilities/Utilities.js'
-import Message from '../models/message.js'
+import Message from '../models/Message.js'
 
 export const insertSingleMessage = async (productID, type, text) => {
   await Message.create({

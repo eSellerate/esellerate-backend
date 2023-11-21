@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /*
 No se donde meter esta surrada le pueden cambiar lo que sea
 todo es tu culpa amlo idiota
@@ -5,14 +6,14 @@ todo es tu culpa amlo idiota
 
 import MercadoLibreAuth from './models/MercadoLibreAuth.js'
 import MercadoLibreApp from './models/MercadolibreApp.js'
-import Message from './models/message.js';
-import { getMessageMotives, getMessages, sendMessage, sendMessageMotiveOther } from './repositories/messages.js';
-import { getOrdersByDateRange, getOrdersPending, getOrdersRecent } from './repositories/orders.js';
+import Message from './models/Message.js'
+import { getMessageMotives, getMessages, sendMessage, sendMessageMotiveOther } from './repositories/messages.js'
+import { getOrdersByDateRange, getOrdersPending, getOrdersRecent } from './repositories/orders.js'
 
-//hace falta una funcion para renovar el token automaticamente por k sino esto revienta
+// hace falta una funcion para renovar el token automaticamente por k sino esto revienta
 
-var previousDate = new Date("2023-11-10");
-var defaultMessage = "Muchas gracias por su compra"
+let previousDate = new Date('2023-11-10')
+const defaultMessage = 'Muchas gracias por su compra'
 
 async function processMessage(token, order, id, client_id, messages) {
     let bFirstConversaton = true
@@ -37,7 +38,8 @@ async function processMessage(token, order, id, client_id, messages) {
             }
         }
     }
-    /*
+  }
+  /*
         let response = await sendMessage(token, id, client_id, defaultMessage, null)
         if (response.data === undefined) {
             response = await sendMessageMotiveOther(token, id, defaultMessage)
@@ -62,48 +64,45 @@ async function processOrder(token, order) {
         let message_moderation = messages.data.messages[0].message_moderation
         if (message_moderation.code === 'forbidden' ||
             message_moderation.code === 'rejected' ||
-            message_moderation.code === 'automatic_message')
-            return
+            message_moderation.code === 'automatic_message') { return }
+  }
+  if (motives.status_code != null) {
+    if (motives.code === 'blocked_by_excepted_case') {
+      processMessage(token, order, id, client_id, messages)
+      return
     }
-    if (motives.status_code != null) {
-        if (motives.code === 'blocked_by_excepted_case') {
-            processMessage(token, order, id, client_id, messages)
-            return
-        }
-    }
-    if (motives.data) {
-        let found = motives.data.filter(function (item) { return item.option_id === 'OTHER'; });
-        if (found[0].cap_available === 0)
-            return
-    }
+  }
+  if (motives.data) {
+    const found = motives.data.filter(function (item) { return item.option_id === 'OTHER' })
+    if (found[0].cap_available === 0) {}
+  }
 }
 
-async function processToken(token) {
-    let recent_orders = await getOrdersByDateRange(token, previousDate)
-    //console.log(recent_orders.data.results)
-    let nodes = Object.keys(recent_orders.data.results);
+async function processToken (token) {
+  const recent_orders = await getOrdersByDateRange(token, previousDate)
+  // console.log(recent_orders.data.results)
+  const nodes = Object.keys(recent_orders.data.results)
+  for (let i = 0; i < nodes.length; i++) {
+    const order = recent_orders.data.results[i]
+    processOrder(token, order)
+  }
+}
+
+export async function automaticMessages (newDate) {
+  try {
+    const apps = await MercadoLibreApp.findAll()
+    const nodes = Object.keys(apps)
     for (let i = 0; i < nodes.length; i++) {
-        let order = recent_orders.data.results[i]
-        processOrder(token, order)
-    }
-}
-
-export async function automaticMessages(newDate) {
-    try {
-        let apps = await MercadoLibreApp.findAll();
-        let nodes = Object.keys(apps);
-        for (let i = 0; i < nodes.length; i++) {
-            //console.log(apps[i].dataValues)
-            let token = await MercadoLibreAuth.findOne({
-                where: {
-                    fk_mlapp: apps[i].dataValues.client_id
-                }
-            });
-            await processToken(token.personal_token)
+      // console.log(apps[i].dataValues)
+      const token = await MercadoLibreAuth.findOne({
+        where: {
+          fk_mlapp: apps[i].dataValues.client_id
         }
-        previousDate = newDate
+      })
+      await processToken(token.personal_token)
     }
-    catch (error) {
-        console.log(error.response)
-    }
+    previousDate = newDate
+  } catch (error) {
+    console.log(error.response)
+  }
 }
