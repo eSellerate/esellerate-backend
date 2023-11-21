@@ -16,7 +16,7 @@ var defaultMessage = "Muchas gracias por su compra"
 
 async function processMessage(token, order, id, client_id, messages) {
     let bFirstConversaton = true
-    if(messages.data.messages.length > 0){
+    if (messages.data.messages.length > 0) {
         bFirstConversaton = false
     }
     let nodes = Object.keys(order.order_items);
@@ -29,7 +29,7 @@ async function processMessage(token, order, id, client_id, messages) {
         })
         let nodes = Object.keys(storedMessages);
         for (let i = 0; i < nodes.length; i++) {
-            if(storedMessages[i].type == 1 && !bFirstConversaton)
+            if (storedMessages[i].type == 1 && !bFirstConversaton)
                 continue;
             let response = await sendMessage(token, id, client_id, storedMessages[i].text, null)
             if (response.data === undefined) {
@@ -56,6 +56,8 @@ async function processOrder(token, order) {
     //console.log(messages.data.messages)
     let motives = await getMessageMotives(token, id)
     //console.log(motives.data)
+    if (messages.data.messages == null)
+        return
     if (messages.data.messages.length > 0) {
         let message_moderation = messages.data.messages[0].message_moderation
         if (message_moderation.code === 'forbidden' ||
