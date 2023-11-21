@@ -7,13 +7,21 @@ import { baseUrl } from '../utilities/Utilities.js'
 
 export const createPublication = async (publicationData) => {
   try {
+    let body = publicationData.body
+    var customMessages = null
+    if (body.customMessages != null) {
+      var customMessages = JSON.parse(JSON.stringify(body.customMessages));
+      delete body.customMessages
+    }
     const url = baseUrl + '/items'
     const options = {
       headers: {
         Authorization: `Bearer ${publicationData.token}`
       }
     }
-    const response = await axios.post(url, publicationData.body, options)
+    const response = await axios.post(url, body, options)
+    if (customMessages != null) {
+    }
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
@@ -118,6 +126,40 @@ export const createPublicationTest = async () => {
 }
 
 export const closePublication = async (token, id) => {
+  try {
+    const options = {
+      headers: {
+        Authorization: token
+      }
+    }
+    const data = {
+      status: 'closed'
+    }
+    const response = await axios.put(baseUrl + `/items/${id}`, data, options)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const pausePublication = async (token, id) => {
+  try {
+    const options = {
+      headers: {
+        Authorization: token
+      }
+    }
+    const data = {
+      status: 'paused'
+    }
+    const response = await axios.put(baseUrl + `/items/${id}`, data, options)
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
+export const republishPublication = async (token, id) => {
   try {
     const options = {
       headers: {

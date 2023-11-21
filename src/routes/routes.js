@@ -25,7 +25,8 @@ import {
   createMercadoLibrePublication,
   createMercadoLibrePublicationTest,
   closeMercadoLibrePublication,
-  deleteMercadoLibrePublication
+  deleteMercadoLibrePublication,
+  pauseMercadoLibrePublication
 } from '../controllers/publication.controller.js'
 
 import {
@@ -73,6 +74,7 @@ router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
 router.get('/mercado-libre/close', closeMercadoLibrePublication)
 router.get('/mercado-libre/delete', deleteMercadoLibrePublication)
 router.put('/mercado-libre/modifyProduct', checkCookieCredentials, getMercadoLibreToken, modifyProduct)
+router.get('/mercado-libre/pause', pauseMercadoLibrePublication)
 
 // user controller
 router.post('/login', validateLogin, login)

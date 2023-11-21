@@ -2,7 +2,8 @@ import {
   createPublication,
   createPublicationTest,
   closePublication,
-  deletePublication
+  deletePublication,
+  pausePublication
 }
   from '../repositories/publications.js'
 
@@ -14,6 +15,13 @@ export const createMercadoLibrePublication = async (req, res) => {
 
 export const createMercadoLibrePublicationTest = async (req, res) => {
   const response = await createPublicationTest()
+  res.status(response.status)
+  res.json(response)
+}
+
+export const pauseMercadoLibrePublication = async (req, res) => {
+  const { id } = req.query
+  const response = await pausePublication(req.token, id)
   res.status(response.status)
   res.json(response)
 }
