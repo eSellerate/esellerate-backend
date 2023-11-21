@@ -11,7 +11,7 @@ const Message = sequelize.define('message', {
   },
   fk_product_id: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    allowNull: false
   },
   type: {
     type: DataTypes.INTEGER,
