@@ -146,16 +146,35 @@ export const pausePublication = async (token, id) => {
   try {
     const options = {
       headers: {
-        Authorization: token
+        Authorization: `Bearer ${token}`
       }
     }
     const data = {
       status: 'paused'
     }
     const response = await axios.put(baseUrl + `/items/${id}`, data, options)
-    return HandleAxiosResponse.handleSuccess(response)
+    return response
   } catch (error) {
-    return HandleAxiosResponse.handleError(error)
+    return error
+  }
+}
+
+export const enablePublication = async (token, id) => {
+  try {
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+    const data = {
+      status: 'active'
+    }
+    const response = await axios.put(baseUrl + `/items/${id}`, data, options)
+    return response
+  } catch (error) {
+    return error
   }
 }
 
