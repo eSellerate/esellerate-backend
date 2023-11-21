@@ -26,7 +26,8 @@ import {
   createMercadoLibrePublicationTest,
   closeMercadoLibrePublication,
   deleteMercadoLibrePublication,
-  pauseMercadoLibrePublication
+  pauseMercadoLibrePublication,
+  activateMercadoLibrePublication
 } from '../controllers/publication.controller.js'
 
 import {
@@ -37,21 +38,21 @@ import {
   getMercadoLibreQuestionsFromItem
 } from '../controllers/questions.controller.js'
 
-import { domainDiscovery } from '../controllers/product.controller.js'
+import { domainDiscovery, modifyProduct } from '../controllers/product.controller.js'
 
 import { generateSaleOrder } from '../controllers/pdf.controller.js'
 // middlewares
 import { validateLogin, validateRegister } from '../validator/validators.js'
 import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
 import { getMercadoLibreToken } from '../middlewares/mercadolibre/getMercadoLibreToken.js'
-import { 
-  getMercadoLibreOrder, 
-  getMercadoLibreOrderBySearch, 
-  getMercadoLibreOrderProducts, 
-  getMercadoLibreOrdersAll, 
-  getMercadoLibreOrdersArchived, 
-  getMercadoLibreOrdersPending, 
-  getMercadoLibreOrdersRecent 
+import {
+  getMercadoLibreOrder,
+  getMercadoLibreOrderBySearch,
+  getMercadoLibreOrderProducts,
+  getMercadoLibreOrdersAll,
+  getMercadoLibreOrdersArchived,
+  getMercadoLibreOrdersPending,
+  getMercadoLibreOrdersRecent
 } from '../controllers/orders.controller.js'
 import { getMercadoLibreMessageAttachment, getMercadoLibreMessageByMessageID, getMercadoLibreMessageMotives, getMercadoLibreMessages, sendMercadoLibreMessage } from '../controllers/messages.controller.js'
 
@@ -73,7 +74,9 @@ router.post('/mercado-libre/publish', checkCookieCredentials, getMercadoLibreTok
 router.get('/mercado-libre/publishTest', createMercadoLibrePublicationTest)
 router.get('/mercado-libre/close', closeMercadoLibrePublication)
 router.get('/mercado-libre/delete', deleteMercadoLibrePublication)
-router.get('/mercado-libre/pause', pauseMercadoLibrePublication)
+router.put('/mercado-libre/modifyProduct', checkCookieCredentials, getMercadoLibreToken, modifyProduct)
+router.post('/mercado-libre/pause', checkCookieCredentials, getMercadoLibreToken, pauseMercadoLibrePublication)
+router.post('/mercado-libre/enable', checkCookieCredentials, getMercadoLibreToken, activateMercadoLibrePublication)
 
 // user controller
 router.post('/login', validateLogin, login)

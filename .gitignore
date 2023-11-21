@@ -14,3 +14,6 @@ node_modules
 *.njsproj
 *.sln
 *.sw?
+
+# Folders
+src/public/uploads/

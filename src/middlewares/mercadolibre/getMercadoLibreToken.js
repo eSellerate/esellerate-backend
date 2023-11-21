@@ -6,7 +6,7 @@ export const getMercadoLibreToken = async (req, res, next) => {
   const mercadolibreValues = await GetMercadoLibreAuthValues(user.id)
   if (!mercadolibreValues) {
     res.status(404).json({
-      message: 'El usuaro no tiene una cuenta de Mercado Libre asociada'
+      message: 'El usuario no tiene una cuenta de Mercado Libre asociada'
     })
     return
   }
