@@ -45,7 +45,7 @@ export const getOrdersByAnyID = async (token, id) => {
       }
     }
     let response = await axios.get(url, options)
-    if(response.data.results.length === 0){
+    if (response.data.results.length === 0) {
       response = await getOrdersByPackID(token, id)
       let orders = []
       let nodes = Object.keys(response.data.orders);
@@ -125,8 +125,8 @@ export const getOrdersByDateRange = async (token, date_from) => {
 export const getOrdersAll = async (token) => {
   try {
     const seller_id = getMercadoLibreSellerIDFromToken(token)
-    const url = baseUrl + '/orders/search?seller=' + seller_id 
-              + '&order.status=paid&sort=date_desc'
+    const url = baseUrl + '/orders/search?seller=' + seller_id
+      + '&order.status=paid&sort=date_desc'
     const options = {
       headers: {
         Authorization: `Bearer ${token}`
@@ -135,7 +135,7 @@ export const getOrdersAll = async (token) => {
     const response = await axios.get(url, options)
     let nodes = Object.keys(response.data.results);
     for (let i = 0; i < nodes.length; i++) {
-      var product = await getUserProducts(response.data.results[i].order_items[0].item.id)
+      var product = await getUserProducts(token, response.data.results[i].order_items[0].item.id)
       response.data.results[i].order_items[0].item.image = product.data.pictures[0].url
       response.data.results[i].enabled = true
     }
@@ -148,7 +148,7 @@ export const getOrdersAll = async (token) => {
 export const getOrdersRecent = async (token) => {
   try {
     const seller_id = getMercadoLibreSellerIDFromToken(token)
-    const url = baseUrl + '/orders/search/recent?seller=' + seller_id 
+    const url = baseUrl + '/orders/search/recent?seller=' + seller_id
     const options = {
       headers: {
         Authorization: `Bearer ${token}`
@@ -164,7 +164,7 @@ export const getOrdersRecent = async (token) => {
 export const getOrdersPending = async (token) => {
   try {
     const seller_id = getMercadoLibreSellerIDFromToken(token)
-    const url = baseUrl + '/orders/search/pending?seller=' + seller_id 
+    const url = baseUrl + '/orders/search/pending?seller=' + seller_id
     const options = {
       headers: {
         Authorization: `Bearer ${token}`
@@ -177,10 +177,32 @@ export const getOrdersPending = async (token) => {
   }
 }
 
+export const getOrdersUnfulfilled = async (token) => {
+  try {
+    const seller_id = getMercadoLibreSellerIDFromToken(token)
+    const url = baseUrl + '/orders/search/recent?seller=' + seller_id + '&order.status=paid'
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    const response = await axios.get(url, options)
+    let nodes = Object.keys(response.data.results);
+    for (let i = 0; i < nodes.length; i++) {
+      var product = await getUserProducts(token, response.data.results[i].order_items[0].item.id)
+      response.data.results[i].order_items[0].item.image = product.data.pictures[0].url
+      response.data.results[i].enabled = true
+    }
+    return HandleAxiosResponse.handleSuccess(response)
+  } catch (error) {
+    return HandleAxiosResponse.handleError(error)
+  }
+}
+
 export const getOrdersArchived = async (token) => {
   try {
     const seller_id = getMercadoLibreSellerIDFromToken(token)
-    const url = baseUrl + '/orders/search/archived?seller=' + seller_id 
+    const url = baseUrl + '/orders/search/archived?seller=' + seller_id
     const options = {
       headers: {
         Authorization: `Bearer ${token}`

@@ -18,7 +18,10 @@ import {
   addNewMercadoLibreApp,
   validateApp,
   getProfile as getUserProfile,
-  uploadImage
+  uploadImage,
+  getBlacklist,
+  unBlacklistUser,
+  blacklistUsers
 } from '../controllers/user.controller.js'
 
 import {
@@ -52,7 +55,8 @@ import {
   getMercadoLibreOrdersAll,
   getMercadoLibreOrdersArchived,
   getMercadoLibreOrdersPending,
-  getMercadoLibreOrdersRecent
+  getMercadoLibreOrdersRecent,
+  getMercadoLibreOrdersUnfulfilled
 } from '../controllers/orders.controller.js'
 import { getMercadoLibreMessageAttachment, getMercadoLibreMessageByMessageID, getMercadoLibreMessageMotives, getMercadoLibreMessages, sendMercadoLibreMessage } from '../controllers/messages.controller.js'
 
@@ -121,6 +125,8 @@ router.get('/mercado-libre/orders_archived',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersArchived)
 router.get('/mercado-libre/orders_pending',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersPending)
+router.get('/mercado-libre/orders_unfulfilled',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersUnfulfilled)
 
 // messages
 router.get('/mercado-libre/messages',
@@ -135,6 +141,9 @@ router.get('/mercado-libre/message_attachment',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessageAttachment)
 
 // user controller todo
+router.get('/mercado-libre/blacklist', checkCookieCredentials, getMercadoLibreToken, getBlacklist)
+router.post('/mercado-libre/unblacklist', checkCookieCredentials, getMercadoLibreToken, unBlacklistUser)
+router.post('/mercado-libre/blacklistusers', checkCookieCredentials, getMercadoLibreToken, blacklistUsers)
 router.post('/login', login)
 router.post('/generate-order', checkCookieCredentials, getMercadoLibreToken, generateSaleOrder)
 

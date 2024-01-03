@@ -14,7 +14,6 @@ export const getUserInfo = async (token) => {
         Authorization: `Bearer ${token}`
       }
     })
-    console.log(JSON.stringify(response.data))
     return response
   } catch (error) {
     error.message = "Error al obtener informacion del usuario \n"+error.message

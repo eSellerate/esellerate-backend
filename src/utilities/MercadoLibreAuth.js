@@ -10,8 +10,6 @@ import MercadolibreApp from '../models/MercadolibreApp.js'
  * @returns Object with MercadoLibre values
  */
 export async function GetMercadoLibreAuthValues (userId) {
-  console.log("Searching for user")
-  console.log(userId)
   const user = await User.findOne({
     where: {
       id: userId
@@ -20,7 +18,6 @@ export async function GetMercadoLibreAuthValues (userId) {
       model: MercadolibreAuth
     }
   })
-  console.log(user)
   if (!user) {
     return null
   }

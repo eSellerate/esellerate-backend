@@ -4,6 +4,7 @@ import User from '../models/User.js'
 import UserType from '../models/UserType.js'
 import MercadoLibreAuth from '../models/MercadoLibreAuth.js'
 import MercadoLibreApp from '../models/MercadolibreApp.js'
+import axios from 'axios'
 
 // repositories
 import {
@@ -15,6 +16,9 @@ import {
 import checkValidations from '../validator/checkValidations.js'
 import path from 'node:path'
 import 'dotenv/config'
+import { baseUrl } from '../utilities/Utilities.js'
+import { GetMercadoLibreAuthValues } from '../utilities/MercadoLibreAuth.js'
+import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
 
 export const login = async (req, res) => {
   try {
@@ -66,8 +70,6 @@ export const login = async (req, res) => {
         refresh_token: token.data.refresh_token
       })
     }
-    console.log("about to generate session")
-    // generate session id and store session
     const sid = req.session.id
     req.sessionStore.set(sid, userInfo.data, (error) => {
       if (error) {
@@ -77,7 +79,6 @@ export const login = async (req, res) => {
       }
     })
     req.session.destroy()
-    console.log("session destroyed")
     //return success
     res.status(200).json({
       message: 'Bienvenido/a!',
@@ -86,8 +87,6 @@ export const login = async (req, res) => {
     })
   }
   catch (error) {
-    console.log("Login error")
-    console.log(error.message)
     res.status(500).json({
       message: 'Ocurrió un error al iniciar sesion: ' + error.message
     })
@@ -132,7 +131,6 @@ export const register = async (req, res) => {
 }
 
 export const testSession = async (req, res) => {
-  console.log(req.user)
   res.status(200).json({
     message: 'Session ok',
     session: req.session
@@ -263,4 +261,187 @@ export const uploadImage = (req, res) => {
     message: 'imagen(es) guardada(s).',
     images: paths
   })
+}
+
+const getOtherUserInfo = async (userID) => {
+  try {
+    let response = await axios.get(baseUrl + `/users/${userID}`)
+    return response.data
+  } catch (error) {
+    return
+  }
+}
+
+export const getBlacklist = async (req, res) => {
+  try {
+    const id = req.user.id
+    const personal_token = req.token
+    var order_blacklist = []
+    var questions_blacklist = []
+    try {
+      let response = await axios.get(baseUrl + `/users/${id}/questions_blacklist`, {
+        headers: {
+          Authorization: `Bearer ${personal_token}`
+        }
+      })
+      questions_blacklist = response.data.users
+      for (var i = 0; i < questions_blacklist.length; i++) {
+        let user_info = await getOtherUserInfo(questions_blacklist[i].id)
+        questions_blacklist[i].nickname = user_info.nickname
+        questions_blacklist[i].address = user_info.address.city.concat(',', user_info.address.state)
+        questions_blacklist[i].questions = true
+        questions_blacklist[i].order = false
+      }
+    } catch (error) {
+      questions_blacklist = []
+    }
+    let response = await axios.get(baseUrl + `/users/${id}/order_blacklist`, {
+      headers: {
+        Authorization: `Bearer ${personal_token}`
+      }
+    })
+    order_blacklist = response.data
+    for (var i = 0; i < order_blacklist.length; i++) {
+      let user_info = await getOtherUserInfo(order_blacklist[i].user.id)
+      order_blacklist[i].user.nickname = user_info.nickname
+      order_blacklist[i].user.address = user_info.address.city.concat(',', user_info.address.state)
+      order_blacklist[i].user.questions = false
+      order_blacklist[i].user.order = true
+    }
+    /*if (!questions_blacklist || !questions_blacklist.length) {
+      res.status(200).json(order_blacklist)
+      return
+    }*/
+    if (!order_blacklist || !order_blacklist.length) {
+      res.status(200).json(questions_blacklist)
+      return
+    }
+    //merge blacklists
+    let result = questions_blacklist
+    for (var i = 0; i < order_blacklist.length; i++) {
+      var found = false;
+      for (var j = 0; j < result.length; j++) {
+        if (result[j].id == order_blacklist[i].user.id) {
+          found = true;
+          result[i].order = true
+          break;
+        }
+      }
+      if (!found) {
+        result.push(order_blacklist[i].user);
+      }
+    }
+    res.status(200).json(result)
+  } catch (error) {
+    if (error.response)
+      res.status(error.response.status).json(error.message)
+    res.status(400).json(error.message)
+  }
+}
+
+export const searchUserByNickname = async (nickname) => {
+  try {
+    let response = await axios.get(baseUrl + `/sites/MLM/search?nickname=${nickname}`)
+    return await getOtherUserInfo(response.data.seller.id)
+  } catch (error) {
+    return
+  }
+}
+
+export const getUserByIDOrNickname = async (id_nickname) => {
+  try {
+    let response = await getOtherUserInfo(id_nickname);
+    if (!response)
+      response = await searchUserByNickname(id_nickname)
+    return response
+  } catch (error) {
+    return;
+  };
+}
+
+export const blacklistUser = async (token, sellerid, buyerid, type) => {
+  try {
+    var url = baseUrl + `/users/${sellerid}/`
+    switch (type) {
+      case "order":
+        url = url + "order_blacklist"
+        break;
+      case "questions":
+        url = url + "questions_blacklist"
+        break;
+      default:
+        return;
+    }
+    const response = await axios.post(
+      url,
+      {
+        user_id: buyerid
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.log("error on blacklist")
+    console.log(error.message)
+    return
+  }
+}
+
+export const blacklistUsers = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const personal_token = req.token;
+    const blacklist_types = req.body.blacklist_types;
+    var users = req.body.users;
+    for (var i = 0; i < users.length; i++) {
+      users[i] = await getUserByIDOrNickname(users[i]);
+    }
+    users = users.filter(function (element) {
+      return element !== undefined;
+    });
+    for (var i = 0; i < blacklist_types.length; i++) {
+      for (var j = 0; j < users.length; j++) {
+        await blacklistUser(personal_token, id, users[j].id, blacklist_types[i])
+      }
+    }
+    res.status(200).json("Usuarios bloqueados")
+  } catch (error) {
+    if (error.response)
+      res.status(error.response.status).json(error.message)
+    res.status(400).json(error.message)
+    console.log(error.message)
+  }
+}
+
+export const unBlacklistUser = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const personal_token = req.token;
+    const user_id = req.body.user_id
+    const type = req.body.type
+    var url = baseUrl + `/users/${id}/`
+    switch (type) {
+      case "order":
+        url = url + "order_blacklist"
+        break;
+      case "questions":
+        url = url + "questions_blacklist"
+        break;
+      default:
+        return;
+    }
+    url = url + `/${user_id}`
+    let response = await axios.delete(url, {
+      headers: {
+        Authorization: `Bearer ${personal_token}`
+      }
+    })
+    res.status(200).json(response.data)
+  } catch (error) {
+    console.log(error)
+  }
 }

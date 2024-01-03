@@ -72,11 +72,8 @@ export const getMercadoLibreItems = async (req, res) => {
 export const getMercadoLibreUserProducts = async (req, res) => {
   // get user
   const user = req.user
-  console.log("Productos, usuario: ")
-  console.log(req.user)
   const mercadolibreValues = await GetMercadoLibreAuthValues(user.id)
   if (!mercadolibreValues) {
-    console.log("No tiene cuenta")
     res.status(404).json({
       message: 'El usuario no tiene una cuenta de Mercado Libre asociada'
     })
@@ -106,10 +103,7 @@ export const getMercadoLibreProductByID = async (req, res) => {
   // get user
   const user = req.user
   const mercadolibreValues = await GetMercadoLibreAuthValues(user.id)
-  console.log("Productos por id, usuario: ")
-  console.log(req.user)
   if (!mercadolibreValues) {
-    console.log("No tiene cuenta")
     res.status(404).json({
       message: 'El usuario no tiene una cuenta de Mercado Libre asociada'
     })
