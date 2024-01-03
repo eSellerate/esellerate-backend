@@ -15,14 +15,14 @@ import { getQuestionsAll } from '../repositories/questions.js'
 export const getProfile = async (req, res) => {
   const user = req.user
   try {
-    const { fk_mlapp, personal_token, refresh_token } = await GetMercadoLibreAuthValues(user.id)
+    const { personal_token, refresh_token } = await GetMercadoLibreAuthValues(user.id)
     const response = await getUserInfo(personal_token)
     if (response.status !== 200) {
       // get client_secrets
-      const { client_secret } = await GetMercadoLibreAppValues(fk_mlapp)
+      const { client_id, client_secret} = global.gmercadoLibreApp
       // try to refresh token
       const response = await refreshToken({
-        clientId: fk_mlapp,
+        clientId: client_id,
         clientSecret: client_secret,
         refreshToken: refresh_token
       })
@@ -72,8 +72,11 @@ export const getMercadoLibreItems = async (req, res) => {
 export const getMercadoLibreUserProducts = async (req, res) => {
   // get user
   const user = req.user
+  console.log("Productos, usuario: ")
+  console.log(req.user)
   const mercadolibreValues = await GetMercadoLibreAuthValues(user.id)
   if (!mercadolibreValues) {
+    console.log("No tiene cuenta")
     res.status(404).json({
       message: 'El usuario no tiene una cuenta de Mercado Libre asociada'
     })
@@ -88,7 +91,7 @@ export const getMercadoLibreUserProducts = async (req, res) => {
   const { results } = list.data
   const products = []
   for (let i = 0; i < results.length; i++) {
-    const product = await getUserProducts(results[i])
+    const product = await getUserProducts(personal_token, results[i])
     if (product.status !== 200) {
       continue
     }
@@ -103,7 +106,10 @@ export const getMercadoLibreProductByID = async (req, res) => {
   // get user
   const user = req.user
   const mercadolibreValues = await GetMercadoLibreAuthValues(user.id)
+  console.log("Productos por id, usuario: ")
+  console.log(req.user)
   if (!mercadolibreValues) {
+    console.log("No tiene cuenta")
     res.status(404).json({
       message: 'El usuario no tiene una cuenta de Mercado Libre asociada'
     })

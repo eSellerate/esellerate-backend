@@ -15,29 +15,13 @@ const User = sequelize.define('user', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  username: {
+  nickname: {
     type: DataTypes.STRING(20),
     allowNull: true
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  first_name: {
-    type: DataTypes.STRING(30),
-    allowNull: false
-  },
-  last_name: {
-    type: DataTypes.STRING(30),
-    allowNull: false
-  },
-  photo_url: {
-    type: DataTypes.STRING,
-    allowNull: true
   }
 }, {
   freezeTableName: true,

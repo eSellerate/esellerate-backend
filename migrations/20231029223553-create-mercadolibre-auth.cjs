@@ -9,10 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      fk_mlapp: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
       personal_token: {
         type: Sequelize.STRING
       },
@@ -23,15 +19,6 @@ module.exports = {
       timestamps: false,
       freezeTableName: true
     }).then(() => queryInterface.addConstraint('mercadolibre_auth', {
-      fields: ['fk_mlapp'],
-      type: 'foreign key',
-      name: 'fk_client_id',
-      references: {
-        table: 'mercadolibre_app',
-        field: 'client_id'
-      }
-    }
-    )).then(() => queryInterface.addConstraint('mercadolibre_auth', {
       fields: ['id'],
       type: 'foreign key',
       name: 'fk_user_id',

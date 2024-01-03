@@ -59,7 +59,7 @@ def generate():
     svg1 = SVGTree(request.args.get('template'))
     svg2 = SVGTree(request.args.get('background'))
     svg1.insert_on_id(svg2, "replace")
-    svg1.insert_text('perrito')
+    svg1.insert_text(request.args.get('text'))
     return send_file('output.svg')
 
 #svg1 = SVGTree('mask_bone_big.svg')

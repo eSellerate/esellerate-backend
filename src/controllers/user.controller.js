@@ -8,6 +8,7 @@ import MercadoLibreApp from '../models/MercadolibreApp.js'
 // repositories
 import {
   generateNewToken,
+  getUserInfo,
   refreshToken
 } from '../repositories/user.js'
 // middleware
@@ -16,101 +17,81 @@ import path from 'node:path'
 import 'dotenv/config'
 
 export const login = async (req, res) => {
-  // validate request data
-  if (checkValidations(req, res)) {
-    return
-  }
-  // get email and password from request body
-  const { username, email, password } = req.body
-  // find user by email
-  const user = await User.findOne({
-    where: {
-      email
-    },
-    include: {
-      model: MercadoLibreAuth,
-      include: {
-        model: MercadoLibreApp
-      }
-    }
-  })
-  // check if password is correct (add bcrypt)
-  if (user.password !== password) {
-    res.status(401).json({
-      message: 'El usuario o la contraseña son incorrectos'
-    })
-    return
-  }
+  try {
+    // get code from request body
+    const { code } = req.body
 
-  // create and store session
-  const sessionObject = {
-    id: user.dataValues.id,
-    email: user.dataValues.email,
-    password: user.dataValues.password,
-    firstName: user.dataValues.first_name,
-    lastName: user.dataValues.last_name
-  }
-  // generate session id and store session
-  const sid = req.session.id
-  req.sessionStore.set(sid, sessionObject, (error) => {
-    if (error) {
-      res.status(500).json({
-        message: 'Ocurrió un error al iniciar sesión, intente nuevamente'
+    // get app data
+    const { client_id, client_secret, redirect_url } = global.gmercadoLibreApp
+
+    //generate token with code
+    const token = await generateNewToken({
+      client_id,
+      client_secret,
+      redirect_url,
+      code: code
+    })
+
+    //get user info
+    const userInfo = await getUserInfo(token.data.access_token)
+    const { id, nickname, email } = userInfo.data
+
+    //search if user exists
+    var user = await User.findOne({
+      where: {
+        id
+      }
+    })
+    if (user) {
+      await MercadoLibreAuth.update({
+        personal_token: token.data.access_token,
+        refresh_token: token.data.refresh_token
+      }, {
+        where: {
+          id
+        }
       })
     }
-  })
-
-  // destructuring mercadolibre app data
-  const { mercadolibre_auth } = user.dataValues
-  if (!mercadolibre_auth) { // check if user has a mercado libre app associated
-    res.status(202).json({
-      message: 'El usuario no tiene una aplicación de Mercado Libre asociada',
-      sid,
-      user: {
-        id: user.dataValues.id,
-        email: user.dataValues.email,
-        firstName: user.dataValues.first_name,
-        lastName: user.dataValues.last_name,
-        photoUrl: user.dataValues.photo_url
+    //if not, register new user
+    else {
+      user = await User.create({
+        id: id,
+        user_type_id: 2,
+        nickname: nickname,
+        email
+      })
+      await MercadoLibreAuth.create({
+        id: id,
+        personal_token: token.data.access_token,
+        refresh_token: token.data.refresh_token
+      })
+    }
+    console.log("about to generate session")
+    // generate session id and store session
+    const sid = req.session.id
+    req.sessionStore.set(sid, userInfo.data, (error) => {
+      if (error) {
+        res.status(500).json({
+          message: 'Ocurrió un error al iniciar sesión, intente nuevamente'
+        })
       }
     })
-    // delete session
     req.session.destroy()
-    return
+    console.log("session destroyed")
+    //return success
+    res.status(200).json({
+      message: 'Bienvenido/a!',
+      sid,
+      user: userInfo.data
+    })
   }
-  req.session.destroy()
-  // try to refresh token
-  const { client_secret } = user.dataValues.mercadolibre_auth.mercadolibre_apps[0].dataValues
-  const { fk_mlapp, refresh_token } = user.dataValues.mercadolibre_auth
-  const response = await refreshToken({
-    clientId: fk_mlapp,
-    clientSecret: client_secret,
-    refreshToken: refresh_token
-  })
-  if (response.status !== 200) {
-    res.status(response.status).json(response.data)
-    return
+  catch (error) {
+    console.log("Login error")
+    console.log(error.message)
+    res.status(500).json({
+      message: 'Ocurrió un error al iniciar sesion: ' + error.message
+    })
   }
-  // update token
-  await MercadoLibreAuth.update({
-    personal_token: response.data.access_token,
-    refresh_token: response.data.refresh_token
-  }, {
-    where: {
-      id: user.dataValues.id
-    }
-  })
-  res.status(200).json({
-    message: 'Bienvenido/a!',
-    sid,
-    user: {
-      id: user.dataValues.id,
-      email: user.dataValues.email,
-      firstName: user.dataValues.first_name,
-      lastName: user.dataValues.last_name,
-      photoUrl: user.dataValues.photo_url
-    }
-  })
 }
 
 export const logout = async (req, res) => {
@@ -192,7 +173,6 @@ export const addNewMercadoLibreApp = async (req, res) => {
     // create new mercado libre auth
     await MercadoLibreAuth.create({
       id: user.id,
-      fk_mlapp: client_id,
       personal_token: access_token,
       refresh_token
     })
@@ -222,7 +202,6 @@ export const addNewMercadoLibreApp = async (req, res) => {
   // create new mercado libre auth
   await MercadoLibreAuth.create({
     id: user.id,
-    fk_mlapp: client_id,
     personal_token: access_token,
     refresh_token
   })
@@ -253,7 +232,7 @@ export const getProfile = async (req, res) => {
   // extract user from cookie
   const user = await User.findOne({
     attributes: {
-      exclude: ['password', 'user_type_id']
+      exclude: ['user_type_id']
     },
     where: {
       id: req.user.id

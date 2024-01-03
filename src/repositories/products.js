@@ -54,9 +54,13 @@ export const getItems = async (token) => {
   }
 }
 
-export const getUserProducts = async (productID) => {
+export const getUserProducts = async (token, productID) => {
   try {
-    const response = await axios.get(baseUrl + `/items/${productID}`)
+    const response = await axios.get(baseUrl + `/items/${productID}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)

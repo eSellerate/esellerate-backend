@@ -12,6 +12,7 @@ import multipart from 'connect-multiparty'
 import 'dotenv/config'
 import schedule from 'node-schedule'
 import { automaticMessages } from './automatization.js'
+import MercadoLibreApp from './models/MercadolibreApp.js'
 // import router from './routes/routes.js'
 
 const app = express()
@@ -31,9 +32,13 @@ app.use(cookieParser())
 app.use(cors({
   origin: [
     'http://localhost:5173',
+    'https://localhost:5173',
     'http://127.0.0.1:5173',
+    'https://127.0.0.1:5173',
     'http://162.243.186.254:5173',
+    'https://162.243.186.254:5173',
     'http://162.243.186.254:5174',
+    'https://162.243.186.254:5174',
     'http://esellerate.com.mx:5173',
     'http://esellerate.com.mx',
     'https://esellerate.com.mx',
@@ -70,9 +75,16 @@ app.use('/api/v1', router)
 app.use(router)
 
 //1 es el intervalo de minutos en los que se ejecuta
-const job = schedule.scheduleJob("*/10 * * * * *", function(){
-  console.log('Ejecutando Mensajes Automaticos!');
-  automaticMessages(new Date())
-});
+//const job = schedule.scheduleJob("*/10 * * * * *", function(){
+  //console.log('Ejecutando Mensajes Automaticos!');
+  //automaticMessages(new Date())
+//});
+
+global.gmercadoLibreApp = await MercadoLibreApp.findOne({
+})
+
+global.gmercadoLibreApp = global.gmercadoLibreApp.dataValues
+
+console.log(global.gmercadoLibreApp)
 
 export default app

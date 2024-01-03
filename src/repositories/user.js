@@ -14,9 +14,11 @@ export const getUserInfo = async (token) => {
         Authorization: `Bearer ${token}`
       }
     })
+    console.log(JSON.stringify(response.data))
     return response
   } catch (error) {
-    return error.response
+    error.message = "Error al obtener informacion del usuario \n"+error.message
+    throw error
   }
 }
 
@@ -27,7 +29,8 @@ export const getUserInfo = async (token) => {
  * @returns response from Mercado Libre API or error
  */
 export const generateNewToken = async (client) => {
-  const { client_id, client_secret, redirect_uri, code } = client
+  const { client_id, client_secret, redirect_url, code } = client
+  const redirect_uri = redirect_url
   try {
     const response = await axios.post('https://api.mercadolibre.com/oauth/token', {
       grant_type: 'authorization_code',
@@ -38,7 +41,8 @@ export const generateNewToken = async (client) => {
     })
     return response
   } catch (error) {
-    return error.response
+    error.message = "Error al generar un token \n"+error.message
+    throw(error)
   }
 }
 

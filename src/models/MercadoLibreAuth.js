@@ -10,10 +10,6 @@ const MercadoLibreAuth = sequelize.define('mercadolibre_auth', {
     primaryKey: true,
     allowNull: false
   },
-  fk_mlapp: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   personal_token: {
     type: DataTypes.STRING
   },
@@ -21,8 +17,5 @@ const MercadoLibreAuth = sequelize.define('mercadolibre_auth', {
     type: DataTypes.STRING
   }
 }, DbOptions)
-
-// Relations
-MercadoLibreAuth.hasMany(MercadoLibreApp, { foreignKey: 'client_id', sourceKey: 'fk_mlapp' })
 
 export default MercadoLibreAuth

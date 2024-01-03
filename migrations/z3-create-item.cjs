@@ -8,10 +8,6 @@ module.exports = {
         allowNull: false,
         primaryKey: true
       },
-      fk_mlapp: {
-        type: Sequelize.STRING(255),
-        allowNull: false
-      },
       stock: {
         type: Sequelize.INTEGER,
         allowNull: false
@@ -39,14 +35,6 @@ module.exports = {
       references: {
         table: 'item',
         field: 'id'
-      }
-    })).then(() => queryInterface.addConstraint('item', {
-      fields: ['fk_mlapp'],
-      type: 'foreign key',
-      name: 'fk_client_idd',
-      references: {
-        table: 'mercadolibre_app',
-        field: 'client_id'
       }
     })).then(() => queryInterface.addConstraint('item', {
       fields: ['fk_design'],

@@ -8,10 +8,6 @@ const Item = sequelize.define('item', {
     allowNull: false,
     primaryKey: true
   },
-  fk_mlapp: {
-    type: DataTypes.STRING(255),
-    allowNull: false,
-  },
   stock: {
     type: DataTypes.INTEGER,
     allowNull: false
