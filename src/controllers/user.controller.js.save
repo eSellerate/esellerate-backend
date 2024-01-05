@@ -361,6 +361,7 @@ export const searchUserByNickname = async (nickname) => {
 
 export const getUserByIDOrNickname = async (id_nickname) => {
   try {
+    console.log(id_nickname)
     let response = await getOtherUserInfo(id_nickname);
     if (!response)
       response = await searchUserByNickname(id_nickname)
@@ -399,7 +400,6 @@ export const blacklistUser = async (token, sellerid, buyerid, type) => {
     return response.data
   } catch (error) {
     console.log("error on blacklist")
-    console.log(error)
     console.log(error.message)
     return
   }

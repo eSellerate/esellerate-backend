@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": null,
+    "password": "esellerate123",
     "database": "esellerate",
     "host": "127.0.0.1",
     "dialect": "mariadb"
@@ -15,9 +15,9 @@
   },
   "production": {
     "username": "root",
-    "password": null,
+    "password": "esellerate123",
     "database": "esellerate",
-    "host": "127.0.0.1",
+    "host": "localhost",
     "dialect": "mariadb"
   }
 }
