@@ -35,17 +35,14 @@ export const getPostTypes = async () => {
   }
 }
 
-export const getItems = async (token, scrollId) => {
+export const getItems = async (token, offset) => {
   // get user id
   const user = await getUserInfo(token)
   if (user.status !== 200) {
     return user
   }
   const { id } = user.data
-  let url = baseUrl + `/users/${id}/items/search?catalog_listing=false&search_type=scan&limit=10&orders=start_time_desc`
-  if (scrollId) {
-    url = url + `&scroll_id=${scrollId}`
-  }
+  const url = baseUrl + `/users/${id}/items/search?catalog_listing=false&offset=${offset}&limit=10&orders=start_time_desc`
   console.log(url)
   try {
     const response = await axios.get(url, {

@@ -70,8 +70,8 @@ export const getMercadoLibreItems = async (req, res) => {
 }
 
 export const getMercadoLibreUserProducts = async (req, res) => {
-  // get scroll
-  const scrollId = req.body.scroll_id
+  // get offset
+  const offset = req.body.offset ? req.body.offset : 0
   // get user
   const user = req.user
   const mercadolibreValues = await GetMercadoLibreAuthValues(user.id)
@@ -82,12 +82,12 @@ export const getMercadoLibreUserProducts = async (req, res) => {
     return
   }
   const { personal_token } = mercadolibreValues
-  const list = await getItems(personal_token, scrollId)
+  const list = await getItems(personal_token, offset)
   if (list.status !== 200) {
     res.status(list.status)
     res.json(list)
   }
-  const { results, scroll_id, paging } = list.data
+  const { results, paging } = list.data
   const products = []
   for (let i = 0; i < results.length; i++) {
     const product = await getUserProducts(personal_token, results[i])
@@ -100,7 +100,6 @@ export const getMercadoLibreUserProducts = async (req, res) => {
   res.status(200)
   res.json({
     products,
-    scroll: scroll_id,
     paging
   })
 }
