@@ -274,6 +274,18 @@ const getOtherUserInfo = async (userID) => {
   }
 }
 
+const getBlacklistUserInfo = (user_info) => {
+  let blacklist_user_info = {}
+  blacklist_user_info.nickname = user_info.nickname
+  blacklist_user_info.address = "----"
+  if (user_info.address.city !== undefined) {
+    blacklist_user_info.address = user_info.address.city
+    if (user_info.address.state !== undefined)
+      blacklist_user_info.address = blacklist_user_info.address + ',' + user_info.address.state
+  }
+  return blacklist_user_info
+}
+
 export const getBlacklist = async (req, res) => {
   try {
     const id = req.user.id
@@ -288,14 +300,6 @@ export const getBlacklist = async (req, res) => {
       })
       questions_blacklist = response.data.users
       for (var i = 0; i < questions_blacklist.length; i++) {
-        let user_info = await getOtherUserInfo(questions_blacklist[i].id)
-        questions_blacklist[i].nickname = user_info.nickname
-        if(user_info.address)
-        {
-          questions_blacklist[i].address = user_info.address.city
-          if(user_info.address.state)
-            questions_blacklist[i].address = questions_blacklist[i].address + ',' + user_info.address.state
-        }
         questions_blacklist[i].questions = true
         questions_blacklist[i].order = false
       }
@@ -307,43 +311,46 @@ export const getBlacklist = async (req, res) => {
         Authorization: `Bearer ${personal_token}`
       }
     })
-    order_blacklist = response.data
-    for (var i = 0; i < order_blacklist.length; i++) {
-      let user_info = await getOtherUserInfo(order_blacklist[i].user.id)
-      order_blacklist[i].user.nickname = user_info.nickname
-      if (user_info.address) {
-        order_blacklist[i].user.address = user_info.address.city
-        if (user_info.address.state)
-          order_blacklist[i].user.address = questions_blacklist[i].address + ',' + user_info.address.state
-      }
-      order_blacklist[i].user.questions = false
-      order_blacklist[i].user.order = true
+    let response_order_blacklist = response.data
+    for (var i = 0; i < response_order_blacklist.length; i++) {
+      order_blacklist[i] = {}
+      order_blacklist[i].id = response_order_blacklist[i].user.id
+      order_blacklist[i].questions = false
+      order_blacklist[i].order = true
     }
-    /*if (!questions_blacklist || !questions_blacklist.length) {
-      res.status(200).json(order_blacklist)
-      return
-    }*/
-    if (!order_blacklist || !order_blacklist.length) {
-      res.status(200).json(questions_blacklist)
-      return
+    var blacklist = []
+    if (!questions_blacklist || !questions_blacklist.length) {
+      blacklist = order_blacklist
     }
-    //merge blacklists
-    let result = questions_blacklist
-    for (var i = 0; i < order_blacklist.length; i++) {
-      var found = false;
-      for (var j = 0; j < result.length; j++) {
-        if (result[j].id == order_blacklist[i].user.id) {
-          found = true;
-          result[i].order = true
-          break;
+    else if (!order_blacklist || !order_blacklist.length) {
+      blacklist = questions_blacklist
+    }
+    else {
+      //mergin time
+      blacklist = questions_blacklist
+      for (var i = 0; i < order_blacklist.length; i++) {
+        var found = false;
+        for (var j = 0; j < blacklist.length; j++) {
+          if (blacklist[j].id == order_blacklist[i].id) {
+            found = true;
+            blacklist[j].order = true
+            break;
+          }
+        }
+        if (!found) {
+          blacklist.push(order_blacklist[i]);
         }
       }
-      if (!found) {
-        result.push(order_blacklist[i].user);
-      }
     }
-    res.status(200).json(result)
+    //fill info
+    for (var i = 0; i < blacklist.length; i++) {
+      let user_info = await getOtherUserInfo(blacklist[i].id)
+      blacklist[i] = {...blacklist[i], ...getBlacklistUserInfo(user_info)};
+    }
+    res.status(200).json(blacklist)
   } catch (error) {
+    console.log("Error getting blacklist: ")
+    console.log(error.message)
     if (error.response)
       res.status(error.response.status).json(error.message)
     res.status(400).json(error.message)
