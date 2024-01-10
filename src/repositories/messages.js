@@ -50,6 +50,23 @@ export const getMessages = async (token, pack_id) => {
 export const getMessageByMessageID = async (token, id) => {
     try {
         let sellerid = getMercadoLibreSellerIDFromToken(token);
+        const url = baseUrl + `/messages/packs/${id}/sellers/${sellerid}?tag=post_sale`
+        const options = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        const response = await axios.get(url, options)
+        console.log(response.data)
+        return HandleAxiosResponse.handleSuccess(response)
+    } catch (error) {
+        return HandleAxiosResponse.handleError(error)
+    }
+}
+
+export const getMessageByMessageIDUnread = async (token, id) => {
+    try {
+        let sellerid = getMercadoLibreSellerIDFromToken(token);
         console.log(baseUrl + `/messages/packs/${id}/sellers/${sellerid}?tag=post_sale`)
         const url = baseUrl + `/messages/packs/${id}/sellers/${sellerid}?tag=post_sale`
         const options = {
@@ -97,6 +114,7 @@ export const sendMessage = async (token, pack_id, client_id, text, attachments) 
         const seller_id = getMercadoLibreSellerIDFromToken(token)
         //const pack_id = getPackID(token, req.body)
         const url = baseUrl + `/messages/packs/${pack_id}/sellers/${seller_id}?tag=post_sale`
+        console.log(url)
         const options = {
             headers: {
                 Authorization: `Bearer ${token}`
