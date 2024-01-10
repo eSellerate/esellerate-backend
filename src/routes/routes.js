@@ -59,6 +59,7 @@ import {
   getMercadoLibreOrdersUnfulfilled
 } from '../controllers/orders.controller.js'
 import { getMercadoLibreMessageAttachment, getMercadoLibreMessageByMessageID, getMercadoLibreMessageMotives, getMercadoLibreMessages, sendMercadoLibreMessage } from '../controllers/messages.controller.js'
+import { getAnswersQuick } from '../controllers/answersquick.controller.js'
 
 const router = Router()
 
@@ -135,10 +136,15 @@ router.get('/mercado-libre/message_motives',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessageMotives)
 router.get('/mercado-libre/message_by_id',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessageByMessageID)
+router.get('/mercado-libre/message_by_id_unread',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessageByMessageID)
 router.post('/mercado-libre/message_send',
   checkCookieCredentials, getMercadoLibreToken, sendMercadoLibreMessage)
 router.get('/mercado-libre/message_attachment',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessageAttachment)
+router.get('/mercado-libre/answers_quick',
+  checkCookieCredentials, getMercadoLibreToken, getAnswersQuick)
+
 
 // user controller todo
 router.get('/mercado-libre/blacklist', checkCookieCredentials, getMercadoLibreToken, getBlacklist)

@@ -13,6 +13,7 @@ import 'dotenv/config'
 import schedule from 'node-schedule'
 import { automaticMessages } from './automatization.js'
 import MercadoLibreApp from './models/MercadolibreApp.js'
+import { answersAuto } from './answers_auto.js'
 // import router from './routes/routes.js'
 
 const app = express()
@@ -74,11 +75,11 @@ app.use('/api/v1', router)
 // routes
 app.use(router)
 
-//1 es el intervalo de minutos en los que se ejecuta
-//const job = schedule.scheduleJob("*/10 * * * * *", function(){
-  //console.log('Ejecutando Mensajes Automaticos!');
-  //automaticMessages(new Date())
-//});
+//1 es el intervalo de minutos en los que se ejecuta /10
+const job = schedule.scheduleJob("*/10 * * * * *", function(){
+  console.log('Ejecutando Mensajes Automaticos!');
+  answersAuto();
+});
 
 global.gmercadoLibreApp = await MercadoLibreApp.findOne({
 })

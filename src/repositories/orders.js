@@ -171,6 +171,13 @@ export const getOrdersPending = async (token) => {
       }
     }
     const response = await axios.get(url, options)
+    console.log(response.data)
+    let nodes = Object.keys(response.data.results);
+    for (let i = 0; i < nodes.length; i++) {
+      var product = await getUserProducts(token, response.data.results[i].order_items[0].item.id)
+      response.data.results[i].order_items[0].item.image = product.data.pictures[0].url
+      response.data.results[i].enabled = true
+    }
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)
