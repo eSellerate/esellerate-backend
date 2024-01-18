@@ -1,6 +1,9 @@
 #node modules
 node_modules
 
+#config folder
+config/config.json
+
 # dotenv environment variables file
 .env
 
