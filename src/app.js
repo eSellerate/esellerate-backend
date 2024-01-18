@@ -75,11 +75,11 @@ app.use('/api/v1', router)
 // routes
 app.use(router)
 
-//1 es el intervalo de minutos en los que se ejecuta /10
-const job = schedule.scheduleJob("*/20 * * * * *", function(){
-  console.log('Ejecutando Mensajes Automaticos!');
-  answersAuto(new Date());
-});
+// //1 es el intervalo de minutos en los que se ejecuta /10
+// const job = schedule.scheduleJob("*/10 * * * * *", function(){
+//   console.log('Ejecutando Mensajes Automaticos!');
+//   answersAuto(new Date());
+// });
 
 global.gmercadoLibreApp = await MercadoLibreApp.findOne({
 })
