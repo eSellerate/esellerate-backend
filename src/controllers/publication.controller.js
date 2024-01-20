@@ -42,8 +42,8 @@ export const closeMercadoLibrePublication = async (req, res) => {
 }
 
 export const deleteMercadoLibrePublication = async (req, res) => {
-  const { id } = req.query
-  const response = await deletePublication(req.token, id)
+  const { ID } = req.body
+  const response = await deletePublication(req.token, ID)
   res.status(response.status)
   res.json(response)
 }

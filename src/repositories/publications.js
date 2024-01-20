@@ -226,7 +226,7 @@ export const deletePublication = async (token, id) => {
   try {
     const options = {
       headers: {
-        Authorization: token
+        Authorization: `Bearer ${token}`
       }
     }
     const dataClose = {
