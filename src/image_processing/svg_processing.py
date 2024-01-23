@@ -6,7 +6,7 @@ from flask import request
 from flask import send_file
 import numpy as np
 
-os.chdir(os.curdir + "/src/image_processing")
+# os.chdir(os.curdir + "/src/image_processing")
 
 ET.register_namespace("", "http://www.w3.org/2000/svg")
 ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
