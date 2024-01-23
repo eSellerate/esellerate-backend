@@ -24,8 +24,8 @@ namespaces = {"": "http://www.w3.org/2000/svg", "xlink": "http://www.w3.org/1999
 
 class SVGTree:
     def __init__(self, svgfile="", type=""):
-        if(svgfile is None):
-            svgfile = ""
+        if svgfile[-4:] != ".svg":
+            svgfile = svgfile + ".svg"
         if os.path.isfile(svgfile):
             self.svgfile = svgfile
         else:
@@ -56,12 +56,13 @@ class SVGTree:
         x = self.viewBox[2]
         y = self.viewBox[3]
         STYLE_BORDERED_TEXT = (
-            """
-            text {
-            font: """
+            """.sttext{font: """
             + str(y / 5)
-            + """px bold sans-serif; stroke-linejoin: round;
-            text-anchor: middle; fill: white; stroke: black;
+            + """px sans-serif; stroke-linejoin: round; text-anchor: middle; fill: white; stroke: black;
+            }"""
+            + """.sttextbold{font: """
+            + str(y / 5)
+            + """px bold sans-serif; stroke-linejoin: round; text-anchor: middle; fill: white; stroke: black;
             }"""
         )
         self.style.text = self.style.text + STYLE_BORDERED_TEXT
@@ -69,7 +70,16 @@ class SVGTree:
         insert.append(
             (
                 ET.fromstring(
-                    '<text x="50.5%" y="58%" width="20" style="stroke-width: 4.5px; paint-order: stroke;">'
+                    '<text class="sttextbold" x="50.5%" y="58%" width="20" style="stroke-width: 4.5px; paint-order: stroke;">'
+                    + text
+                    + "</text>"
+                )
+            )
+        )
+        insert.append(
+            (
+                ET.fromstring(
+                    '<text class="sttext" x="50.5%" y="58%" width="20" style="stroke-width: 4.5px; paint-order: stroke;">'
                     + text
                     + "</text>"
                 )
@@ -83,10 +93,14 @@ app = Flask(__name__)
 
 @app.route("/generate")
 def generate():
-    mask = request.args.get("template")
-
-    svg1 = SVGTree(location_masks + request.args.get("template"), "mask")
-    svg2 = SVGTree(location_backgrounds + request.args.get("background"))
+    mask = request.args.get("mask")
+    if mask is None:
+        mask = ""
+    background = request.args.get("background")
+    if background is None:
+        background = ""
+    svg1 = SVGTree(location_masks + mask, "mask")
+    svg2 = SVGTree(location_backgrounds + background)
     svg1.insert_on_id(svg2, "replace")
     svg1.insert_text(request.args.get("text"))
     return send_file(output)
