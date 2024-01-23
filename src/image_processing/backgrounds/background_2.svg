@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 182.5 117.79" style="enable-background:new 0 0 182.5 117.79;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#007FC1;}
+	.st2{fill:#64BAE1;}
+	.st3{fill:#D9ECF8;}
+	.st4{fill:#AC7BB0;}
+	.st5{fill:#9EBFE3;}
+	.st6{clip-path:url(#SVGID_2_);}
+	.st7{fill:url(#SVGID_3_);stroke:url(#SVGID_4_);stroke-width:4;stroke-miterlimit:10;}
+</style>
+<pattern  y="117.79" width="13.64" height="202.41" patternUnits="userSpaceOnUse" id="New_Pattern_Swatch_9" viewBox="0 -202.41 13.64 202.41" style="overflow:visible;">
+	<g>
+		<rect x="0" y="-202.41" class="st0" width="13.64" height="202.41"/>
+		<rect x="0" y="-202.41" class="st1" width="13.64" height="202.41"/>
+		<rect x="0.89" y="-202.41" class="st2" width="1.7" height="202.41"/>
+		<rect x="8.98" y="-202.41" class="st3" width="1.7" height="202.41"/>
+		<rect x="3.07" y="-202.41" class="st4" width="1.21" height="202.41"/>
+		<rect x="11.22" y="-202.41" class="st4" width="0.61" height="202.41"/>
+		<rect x="4.88" y="-202.41" class="st5" width="2.05" height="202.41"/>
+		<rect x="11.59" y="-202.41" class="st5" width="2.05" height="202.41"/>
+		<rect x="7.31" y="-202.41" class="st2" width="1.08" height="202.41"/>
+	</g>
+</pattern>
+<g>
+	<defs>
+		<rect id="SVGID_1_" y="0.27" width="182.5" height="117.24"/>
+	</defs>
+	<clipPath id="SVGID_2_">
+		<use xlink:href="#SVGID_1_"  style="overflow:visible;"/>
+	</clipPath>
+	<g class="st6">
+		<pattern  id="SVGID_3_" xlink:href="#New_Pattern_Swatch_9" patternTransform="matrix(2.9693 0 0 3.0555 15939.834 15872.9258)">
+		</pattern>
+		<pattern  id="SVGID_4_" xlink:href="#New_Pattern_Swatch_9" patternTransform="matrix(2.9693 0 0 3.0555 15947.0176 16102.3574)">
+		</pattern>
+		<path class="st7" d="M64.89-21.07l34.74-1.44l45.37,1.38c76.91-5.54,38.98,5.72,51.09,20.24c12.33,14.79,31.17,53.7,6.86,54.24
+			l10.31,11.81c19.82-4.9,0.42,36.64-16.06,57.91c-17,21.94-3.5,38.29-54.6,25.53l-51.33,0.04l-59.35,0.04
+			c-30.59-5.46-28.44-7.33-40-14.89c-26.04-17.01-41.56-74.13-19.23-68.52l-0.11-13.27C-58.99,46.85-17.37,10.5-12.34,2.17
+			C-5.18-9.66,24.96-21.04,64.89-21.07z"/>
+	</g>
+</g>
+</svg>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 182.5 117.79" style="enable-background:new 0 0 182.5 117.79;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#E3D283;}
+	.st2{fill:#8BC5D5;}
+	.st3{fill:#80AE27;}
+	.st4{fill:#A77AA8;}
+	.st5{fill:#D97AA4;}
+	.st6{clip-path:url(#SVGID_2_);}
+	.st7{fill:url(#SVGID_3_);}
+</style>
+<pattern  y="117.79" width="13.64" height="202.41" patternUnits="userSpaceOnUse" id="New_Pattern_Swatch_1" viewBox="0 -202.41 13.64 202.41" style="overflow:visible;">
+	<g>
+		<rect x="0" y="-202.41" class="st0" width="13.64" height="202.41"/>
+		<rect x="0" y="-202.41" class="st1" width="13.64" height="202.41"/>
+		<rect x="0.89" y="-202.41" class="st2" width="1.7" height="202.41"/>
+		<rect x="8.98" y="-202.41" class="st3" width="1.7" height="202.41"/>
+		<rect x="3.07" y="-202.41" class="st4" width="1.21" height="202.41"/>
+		<rect x="11.22" y="-202.41" class="st4" width="0.61" height="202.41"/>
+		<rect x="4.88" y="-202.41" class="st5" width="2.05" height="202.41"/>
+		<rect x="11.59" y="-202.41" class="st5" width="2.05" height="202.41"/>
+		<rect x="7.31" y="-202.41" class="st2" width="1.08" height="202.41"/>
+	</g>
+</pattern>
+<g>
+	<defs>
+		<rect id="SVGID_1_" y="0.27" width="182.5" height="117.24"/>
+	</defs>
+	<clipPath id="SVGID_2_">
+		<use xlink:href="#SVGID_1_"  style="overflow:visible;"/>
+	</clipPath>
+	<g class="st6">
+		<pattern  id="SVGID_3_" xlink:href="#New_Pattern_Swatch_1" patternTransform="matrix(3.2411 0 0 1.6961 17947.5215 4819.002)">
+		</pattern>
+		<path class="st7" d="M91.25-54.2c77.81,0,140.91,47.63,140.91,106.37c0,58.74-63.1,106.37-140.91,106.37
+			c-77.8,0-140.91-47.63-140.91-106.37C-49.66-6.57,13.45-54.2,91.25-54.2L91.25-54.2z"/>
+	</g>
+</g>
+</svg>

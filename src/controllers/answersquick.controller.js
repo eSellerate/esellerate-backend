@@ -3,23 +3,20 @@
 import AnswersQuick from '../models/AnswersQuick.js'
 
 export const getAnswersQuick = async (req, res) => {
-    try {
-        const id = req.user.id;
-        const answers = await AnswersQuick.findAll({
-            where: {
-                user_id: id,
-            },
-            raw : true
-        });
-        res.status(200).json(answers)
-    } catch (error) {
-        if (error.response.status)
-            res.status(error.response.status).json(error.message)
-        else
-            res.status(400).json(error.message)
-        console.log("error on getting answers quick")
-        console.log(error.message)
-    }
+  try {
+    const id = req.user.id
+    const answers = await AnswersQuick.findAll({
+      where: {
+        user_id: id
+      },
+      raw: true
+    })
+    res.status(200).json(answers)
+  } catch (error) {
+    if (error.response.status) { res.status(error.response.status).json(error.message) } else { res.status(400).json(error.message) }
+    console.log('error on getting answers quick')
+    console.log(error.message)
+  }
 }
 
 export const setAnswerQuick = async (req, res) => {
