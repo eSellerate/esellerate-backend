@@ -16,7 +16,7 @@ export const getUserInfo = async (token) => {
     })
     return response
   } catch (error) {
-    error.message = "Error al obtener informacion del usuario \n"+error.message
+    error.message = 'Error al obtener informacion del usuario \n' + error.message
     throw error
   }
 }
@@ -29,6 +29,7 @@ export const getUserInfo = async (token) => {
  */
 export const generateNewToken = async (client) => {
   const { client_id, client_secret, redirect_url, code } = client
+  console.log(client)
   const redirect_uri = redirect_url
   try {
     const response = await axios.post('https://api.mercadolibre.com/oauth/token', {
@@ -40,8 +41,9 @@ export const generateNewToken = async (client) => {
     })
     return response
   } catch (error) {
-    error.message = "Error al generar un token \n"+error.message
-    throw(error)
+    error.message = 'Error al generar un token \n' + error.message
+    console.log(error)
+    throw (error)
   }
 }
 

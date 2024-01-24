@@ -24,26 +24,25 @@ export const login = async (req, res) => {
   try {
     // get code from request body
     const { code } = req.body
-
     // get app data
     const { client_id, client_secret, redirect_url } = global.gmercadoLibreApp
-    console.log(client_id);
-    console.log(client_secret);
-    console.log(redirect_url);
-    //generate token with code
+    console.log(client_id)
+    console.log(client_secret)
+    console.log(redirect_url)
+    // generate token with code
     const token = await generateNewToken({
       client_id,
       client_secret,
       redirect_url,
-      code: code
+      code
     })
 
-    //get user info
+    // get user info
     const userInfo = await getUserInfo(token.data.access_token)
     const { id, nickname, email } = userInfo.data
 
-    //search if user exists
-    var user = await User.findOne({
+    // search if user exists
+    let user = await User.findOne({
       where: {
         id
       }
@@ -58,16 +57,16 @@ export const login = async (req, res) => {
         }
       })
     }
-    //if not, register new user
+    // if not, register new user
     else {
       user = await User.create({
-        id: id,
+        id,
         user_type_id: 2,
-        nickname: nickname,
+        nickname,
         email
       })
       await MercadoLibreAuth.create({
-        id: id,
+        id,
         personal_token: token.data.access_token,
         refresh_token: token.data.refresh_token
       })
@@ -81,14 +80,13 @@ export const login = async (req, res) => {
       }
     })
     req.session.destroy()
-    //return success
+    // return success
     res.status(200).json({
       message: 'Bienvenido/a!',
       sid,
       user: userInfo.data
     })
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).json({
       message: 'Ocurrió un error al iniciar sesion: ' + error.message
     })
@@ -267,21 +265,20 @@ export const uploadImage = (req, res) => {
 
 const getOtherUserInfo = async (userID) => {
   try {
-    let response = await axios.get(baseUrl + `/users/${userID}`)
+    const response = await axios.get(baseUrl + `/users/${userID}`)
     return response.data
   } catch (error) {
-    return
+
   }
 }
 
 const getBlacklistUserInfo = (user_info) => {
-  let blacklist_user_info = {}
+  const blacklist_user_info = {}
   blacklist_user_info.nickname = user_info.nickname
-  blacklist_user_info.address = "----"
+  blacklist_user_info.address = '----'
   if (user_info.address.city !== undefined) {
     blacklist_user_info.address = user_info.address.city
-    if (user_info.address.state !== undefined)
-      blacklist_user_info.address = blacklist_user_info.address + ',' + user_info.address.state
+    if (user_info.address.state !== undefined) { blacklist_user_info.address = blacklist_user_info.address + ',' + user_info.address.state }
   }
   return blacklist_user_info
 }
@@ -290,10 +287,10 @@ export const getBlacklist = async (req, res) => {
   try {
     const id = req.user.id
     const personal_token = req.token
-    var order_blacklist = []
-    var questions_blacklist = []
+    const order_blacklist = []
+    let questions_blacklist = []
     try {
-      let response = await axios.get(baseUrl + `/users/${id}/questions_blacklist`, {
+      const response = await axios.get(baseUrl + `/users/${id}/questions_blacklist`, {
         headers: {
           Authorization: `Bearer ${personal_token}`
         }
@@ -306,89 +303,85 @@ export const getBlacklist = async (req, res) => {
     } catch (error) {
       questions_blacklist = []
     }
-    let response = await axios.get(baseUrl + `/users/${id}/order_blacklist`, {
+    const response = await axios.get(baseUrl + `/users/${id}/order_blacklist`, {
       headers: {
         Authorization: `Bearer ${personal_token}`
       }
     })
-    let response_order_blacklist = response.data
+    const response_order_blacklist = response.data
     for (var i = 0; i < response_order_blacklist.length; i++) {
       order_blacklist[i] = {}
       order_blacklist[i].id = response_order_blacklist[i].user.id
       order_blacklist[i].questions = false
       order_blacklist[i].order = true
     }
-    var blacklist = []
+    let blacklist = []
     if (!questions_blacklist || !questions_blacklist.length) {
       blacklist = order_blacklist
-    }
-    else if (!order_blacklist || !order_blacklist.length) {
+    } else if (!order_blacklist || !order_blacklist.length) {
       blacklist = questions_blacklist
-    }
-    else {
-      //mergin time
+    } else {
+      // mergin time
       blacklist = questions_blacklist
       for (var i = 0; i < order_blacklist.length; i++) {
-        var found = false;
-        for (var j = 0; j < blacklist.length; j++) {
+        let found = false
+        for (let j = 0; j < blacklist.length; j++) {
           if (blacklist[j].id == order_blacklist[i].id) {
-            found = true;
+            found = true
             blacklist[j].order = true
-            break;
+            break
           }
         }
         if (!found) {
-          blacklist.push(order_blacklist[i]);
+          blacklist.push(order_blacklist[i])
         }
       }
     }
-    //fill info
+    // fill info
     for (var i = 0; i < blacklist.length; i++) {
-      let user_info = await getOtherUserInfo(blacklist[i].id)
-      blacklist[i] = {...blacklist[i], ...getBlacklistUserInfo(user_info)};
+      const user_info = await getOtherUserInfo(blacklist[i].id)
+      blacklist[i] = { ...blacklist[i], ...getBlacklistUserInfo(user_info) }
     }
     res.status(200).json(blacklist)
   } catch (error) {
-    console.log("Error getting blacklist: ")
+    console.log('Error getting blacklist: ')
     console.log(error.message)
-    if (error.response)
-      res.status(error.response.status).json(error.message)
+    if (error.response) { res.status(error.response.status).json(error.message) }
     res.status(400).json(error.message)
   }
 }
 
 export const searchUserByNickname = async (nickname) => {
   try {
-    let response = await axios.get(baseUrl + `/sites/MLM/search?nickname=${nickname}`)
+    const response = await axios.get(baseUrl + `/sites/MLM/search?nickname=${nickname}`)
     return await getOtherUserInfo(response.data.seller.id)
   } catch (error) {
-    return
+
   }
 }
 
 export const getUserByIDOrNickname = async (id_nickname) => {
   try {
-    let response = await getOtherUserInfo(id_nickname);
-    if (!response)
-      response = await searchUserByNickname(id_nickname)
+    let response = await getOtherUserInfo(id_nickname)
+    if (!response) { response = await searchUserByNickname(id_nickname) }
     return response
   } catch (error) {
-    return;
+    return
   };
 }
 
 export const blacklistUser = async (token, sellerid, buyerid, type) => {
   try {
-    var url = baseUrl + `/users/${sellerid}/`
+    let url = baseUrl + `/users/${sellerid}/`
     switch (type) {
-      case "order":
-        url = url + "order_blacklist"
-        break;
-      case "questions":
-        url = url + "questions_blacklist"
-        break;
+      case 'order':
+        url = url + 'order_blacklist'
+        break
+      case 'questions':
+        url = url + 'questions_blacklist'
+        break
       default:
-        return;
+        return
     }
     const response = await axios.post(
       url,
@@ -401,67 +394,65 @@ export const blacklistUser = async (token, sellerid, buyerid, type) => {
         }
       }
     )
-    console.log("blacklisting")
+    console.log('blacklisting')
     console.log(response.data)
     return response.data
   } catch (error) {
-    console.log("error on blacklist")
+    console.log('error on blacklist')
     console.log(error)
     console.log(error.message)
-    return
   }
 }
 
 export const blacklistUsers = async (req, res) => {
   try {
-    const id = req.user.id;
-    const personal_token = req.token;
-    const blacklist_types = req.body.blacklist_types;
-    var users = req.body.users;
-    console.log("blacklisting several users")
+    const id = req.user.id
+    const personal_token = req.token
+    const blacklist_types = req.body.blacklist_types
+    let users = req.body.users
+    console.log('blacklisting several users')
     console.log(users)
     for (var i = 0; i < users.length; i++) {
-      users[i] = await getUserByIDOrNickname(users[i]);
+      users[i] = await getUserByIDOrNickname(users[i])
     }
     console.log(users)
     users = users.filter(function (element) {
-      return element !== undefined;
-    });
+      return element !== undefined
+    })
     for (var i = 0; i < blacklist_types.length; i++) {
-      for (var j = 0; j < users.length; j++) {
+      for (let j = 0; j < users.length; j++) {
         await blacklistUser(personal_token, id, users[j].id, blacklist_types[i])
       }
     }
-    console.log("users blocked")
-    res.status(200).json("Usuarios bloqueados")
+    console.log('users blocked')
+    res.status(200).json('Usuarios bloqueados')
   } catch (error) {
-    if (error.response)
-      res.status(error.response.status).json(error.message)
+    if (error.response) { res.status(error.response.status).json(error.message) }
     res.status(400).json(error.message)
-    console.log("error on blacklisting users")
+    console.log('error on blacklisting users')
     console.log(error.message)
   }
 }
 
 export const unBlacklistUser = async (req, res) => {
   try {
-    const id = req.user.id;
-    const personal_token = req.token;
+    const id = req.user.id
+    const personal_token = req.token
     const user_id = req.body.user_id
     const type = req.body.type
-    var url = baseUrl + `/users/${id}/`
+    let url = baseUrl + `/users/${id}/`
     switch (type) {
-      case "order":
-        url = url + "order_blacklist"
-        break;
-      case "questions":
-        url = url + "questions_blacklist"
-        break;
+      case 'order':
+        url = url + 'order_blacklist'
+        break
+      case 'questions':
+        url = url + 'questions_blacklist'
+        break
       default:
-        return;
+        return
     }
     url = url + `/${user_id}`
-    let response = await axios.delete(url, {
+    const response = await axios.delete(url, {
       headers: {
         Authorization: `Bearer ${personal_token}`
       }

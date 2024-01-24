@@ -60,6 +60,7 @@ import {
 } from '../controllers/orders.controller.js'
 import { getMercadoLibreMessageAttachment, getMercadoLibreMessageByMessageID, getMercadoLibreMessageMotives, getMercadoLibreMessages, sendMercadoLibreMessage } from '../controllers/messages.controller.js'
 import { getAnswersQuick, setAnswerQuick, deleteAnswerQuick } from '../controllers/answersquick.controller.js'
+import { handleNotifications } from '../answers_auto.js'
 
 const router = Router()
 
@@ -154,6 +155,7 @@ router.get('/mercado-libre/blacklist', checkCookieCredentials, getMercadoLibreTo
 router.post('/mercado-libre/unblacklist', checkCookieCredentials, getMercadoLibreToken, unBlacklistUser)
 router.post('/mercado-libre/blacklistusers', checkCookieCredentials, getMercadoLibreToken, blacklistUsers)
 router.post('/login', login)
+router.post('/notifications', handleNotifications)
 router.post('/generate-order', checkCookieCredentials, getMercadoLibreToken, generateSaleOrder)
 
 export default router

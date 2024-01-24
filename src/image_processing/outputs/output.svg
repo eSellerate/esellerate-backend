@@ -24,10 +24,8 @@
 	.st18{fill:#603F32;}
 	.st19{fill:#7AA641;}
 	.st20{fill:#88162A;}
-
-            text {
-            font: 18.618000000000002px bold sans-serif; stroke-linejoin: round;
-            text-anchor: middle; fill: white; stroke: black;
+.sttext{font: 18.618000000000002px sans-serif; stroke-linejoin: round; text-anchor: middle; fill: white; stroke: black;
+            }.sttextbold{font: 18.618000000000002px bold sans-serif; stroke-linejoin: round; text-anchor: middle; fill: white; stroke: black;
             }</style>
 <g>
 	<defs>
@@ -2380,4 +2378,4 @@
 </g>
 </g>
 <path class="stcut" d="M50.66,13c-0.61-0.85-3.36-3.12-4.51-3.87c-3.81-2.5-8.87-3.76-11.38-3.81C30.71,5.22,27,5.41,23.21,6.63   c-1.52,0.49-3.4,1.27-4.79,1.98C8.92,13.45,4.25,23.69,4.25,33.87c0,6.9,3.49,16.48,8.63,22.71c7.39,8.97,11.25,10.89,17.74,15.4   c2.52,1.78,30.95,16.85,32.28,16.85c1.17,0,22.43-13.06,25.85-15.65c7.75-5.84,17.01-12.35,22.05-18.69   c4.76-5.99,7.15-13.7,7.15-21.28c0-10.65-4.89-20.93-15.68-26.04l0,0c-1.79-0.84-3.69-1.49-5.65-1.97   c-3.05-0.73-5.18-0.95-8.39-0.95c-3.34,0-8.42,1.58-12.74,3.9c-0.77,0.41-4.48,2.94-4.81,3.23c0,0,2.18,12.08-10.15,12.24   C48.72,23.79,50.66,13,50.66,13z" />
-<text x="50.5%" y="58%" width="20" style="stroke-width: 4.5px; paint-order: stroke;">elma caco</text></svg>
+<text class="sttextbold" x="50.5%" y="58%" width="20" style="stroke-width: 4.5px; paint-order: stroke;">prueba</text><text class="sttext" x="50.5%" y="58%" width="20" style="stroke-width: 4.5px; paint-order: stroke;">prueba</text></svg>
