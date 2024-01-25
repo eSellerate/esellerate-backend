@@ -44,7 +44,8 @@ app.use(cors({
     'http://esellerate.com.mx',
     'https://esellerate.com.mx',
     'https://162.243.186.254:3000',
-    'https://esellerate.com.mx:5173'
+    'https://esellerate.com.mx:5173',
+    'http://localhost:5000'
   ],
   credentials: true,
   exposedHeaders: ['Cookie']
@@ -83,9 +84,9 @@ global.gmercadoLibreApp = global.gmercadoLibreApp.dataValues
 console.log(global.gmercadoLibreApp)
 
 // //1 es el intervalo de minutos en los que se ejecuta /10
-// const job = schedule.scheduleJob("*/10 * * * * *", function(){
-//   console.log('Ejecutando Mensajes Automaticos!');
-//   answersAuto(new Date());
-// });
+const job = schedule.scheduleJob('*/10 * * * * *', function () {
+  console.log('Sending Automatic Messages!')
+  answersAuto(new Date())
+})
 
 export default app

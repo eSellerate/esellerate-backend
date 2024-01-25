@@ -42,7 +42,6 @@ export const generateNewToken = async (client) => {
     return response
   } catch (error) {
     error.message = 'Error al generar un token \n' + error.message
-    console.log(error)
     throw (error)
   }
 }

@@ -4,7 +4,11 @@ import AnswersAutoGeneral from './models/AnswersAutoGeneral.js'
 import MercadolibreApp from './models/MercadolibreApp.js'
 import axios from 'axios'
 import { baseUrl } from './utilities/Utilities.js'
-import { getMessageMotives } from './repositories/messages.js'
+import { getMessageMotives, processAttachments } from './repositories/messages.js'
+import pkg from 'convert-svg-to-png'
+import path from 'node:path'
+import fs from 'node:fs'
+const { convertFile } = pkg
 
 const keywords = [
   { word: 'Nombre', uid: 'name' },
@@ -18,6 +22,13 @@ const keywords = [
 const disabledMessagesModerationTypes = ['forbidden', 'rejected', 'automatic_message']
 
 let previousDate = new Date('2023-11-10')
+
+export const pngTest = async (req, res) => {
+  const inputFilePath = path.join(global.__dirname, 'image_processing', 'outputs', 'output.svg')
+  console.log(inputFilePath)
+  const outputFilePath = await convertFile(inputFilePath, [])
+  res.sendFile(outputFilePath)
+}
 
 async function refreshUserToken (user) {
   const { client_id, client_secret } = global.gmercadoLibreApp
@@ -63,13 +74,77 @@ async function getMessages (user, packId) {
   return response.data.messages
 }
 
-async function sendAutoGeneralMessages (user, order) {
+async function sendMessage (user, buyer, packId, text, attachments) {
+  try {
+    let attachmentsIds = []
+    if (attachments !== null) { attachmentsIds = await processAttachments(attachments, user.personal_token) }
+    const response = await axios.post(baseUrl + `/messages/packs/${packId}/sellers/${user.id}?tag=post_sale`,
+      {
+        from: {
+          user_id: user.id
+        },
+        to: {
+          user_id: buyer.id
+        },
+        text,
+        attachments: attachmentsIds
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${user.personal_token}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    error.message = 'Error sending automatic message: ' + error.message
+    console.log(error.message)
+    console.log(error.response.data)
+  }
+}
+
+async function handleDesign (user, buyer, packId, message) {
+  try {
+    // get parameters
+    if (!message.includes('diseño')) { return }
+    const response = await axios.get(process.env.SERVER_DESIGN + `mask=mask_bone_big&background=background_32&text=Chewis&id=${packId}`)
+    // const attachments = []
+    // attachments.push(response.data)
+    console.log(response.data)
+    // sendMessage(user, buyer, packId, '', attachments)
+    const image = fs.createReadStream('src/image_processing/' + response.data)
+    const formData = new FormData()
+    formData.append('file', image, path.basename(response.data))
+    const response2 = await axios.post(baseUrl + '/messages/attachments?tag=post_sale&site_id=MLM',
+      formData, {
+        headers: {
+          Authorization: `Bearer ${user.personal_token}`,
+          'content-type': 'multipart/form-data'
+        }
+      })
+  } catch (error) {
+    error.message = 'Error sending automatic design: ' + error.message
+    console.log(error.message)
+    console.log(error.response.data)
+  }
+}
+
+async function sendAutoGeneralMessage (user, buyer, packId) {
+  console.log('Sending first message')
   const autoGeneral = await AnswersAutoGeneral.findAll({
     where: {
       user_id: user.id
     },
     raw: true
   })
+  for (let i = 0; i < autoGeneral.length; i++) {
+    try {
+      await sendMessage(user, buyer, packId, autoGeneral[i].text, null)
+    } catch (error) {
+      console.log(error.message)
+      return
+    }
+  }
 }
 
 async function sendAutoMessages (user, date) {
@@ -80,8 +155,8 @@ async function sendAutoMessages (user, date) {
   try {
     orders = await getOrders(user, date)
   } catch (error) {
-    console.log(error.message)
-    return
+    error.message = 'error getting orders: ' + error.message
+    throw error
   }
   for (let i = 0; i < orders.length; i++) {
     const order = orders[i]
@@ -90,23 +165,31 @@ async function sendAutoMessages (user, date) {
       packId = order.id
     }
     const messages = await getMessages(user, packId)
-    const motives = await getMessageMotives(user.personal_token, user.id)
-    if (messages == null) { return }
-    if (messages.data.messages.length > 0) {
-      const messageModeration = messages[0].messageModeration
-      if (disabledMessagesModerationTypes.includes(messageModeration)) { return }
+    let motives
+    try {
+      motives = await getMessageMotives(user.personal_token, packId)
+    } catch (error) {
+      console.log(error.message)
+      const errorData = error.response.data
+      if (errorData === undefined) { continue }
+      if (errorData.code !== 'blocked_by_excepted_case') { continue }
+      console.log(errorData)
     }
-    if (motives.status_code != null) {
-      if (motives.code === 'blocked_by_excepted_case') {
-        // process message
-        return
-      }
+    if (messages == null) { continue }
+    if (messages.length > 0) {
+      const messageModeration = messages[0].messageModeration
+      if (disabledMessagesModerationTypes.includes(messageModeration)) { continue }
     }
     if (messages.length < 2) {
       if (messages.length < 1) {
-        // if (messages[0])
+        sendAutoGeneralMessage(user, order.buyer, packId)
+      } else if (messages[0].from.user_id !== user.id) {
+        sendAutoGeneralMessage(user, order.buyer, packId)
       }
     }
+    handleDesign(user, order.buyer, packId, 'diseño')
+    // debuging
+    // await sendMessage(user, order.buyer, packId, 'Porfavor envielo a la brevedad', null)
   }
 }
 
@@ -127,10 +210,17 @@ export async function answersAuto (newDate) {
         console.log(error.message)
         continue
       }
-      sendAutoMessages(user, previousDate)
+      try {
+        sendAutoMessages(user, previousDate)
+      } catch (error) {
+        console.log('error sending automatic messages')
+        console.log(error.message)
+        continue
+      }
     }
     previousDate = newDate
   } catch (error) {
+    console.log('whole auto messages crash! :')
     console.log(error.message)
   }
 }
