@@ -75,6 +75,50 @@ async function getMessages (user, packId) {
   return response.data.messages
 }
 
+async function getMessagesWithoutRead (user, packId) {
+  const response = await axios.get(baseUrl + `/messages/packs/${packId}/sellers/${user.id}?tag=post_sale&mark_as_read=false`,
+    {
+      headers: {
+        Authorization: `Bearer ${user.personal_token}`
+      }
+    }
+  )
+  return response.data.messages
+}
+
+async function getUnreadMessages (user, result) {
+  try {
+    const response = await axios.get(baseUrl + `/messages/${result.resource}?tag=post_sale&mark_as_read=false`,
+      {
+        headers: {
+          Authorization: `Bearer ${user.personal_token}`
+        }
+      }
+    )
+    const messages = response.data.messages.slice(0, result.count)
+    return messages
+  } catch (error) {
+    error.message = 'Error getting unread messages : ' + error.message
+    throw (error)
+  }
+}
+
+async function getUnreadResources (user) {
+  try {
+    const response = await axios.get(baseUrl + '/messages/unread?role=seller&tag=post_sale',
+      {
+        headers: {
+          Authorization: `Bearer ${user.personal_token}`
+        }
+      }
+    )
+    return response.data.results
+  } catch (error) {
+    error.message = 'Error getting unread messages : ' + error.message
+    throw (error)
+  }
+}
+
 async function sendMessage (user, buyer, packId, text, attachments) {
   try {
     let attachmentsIds = []
@@ -104,19 +148,18 @@ async function sendMessage (user, buyer, packId, text, attachments) {
   }
 }
 
-async function handleDesign (user, buyer, packId, message) {
+async function handleDesign (user, buyer, packId, designInfo) {
   try {
     // get parameters
-    if (!message.includes('diseño')) { return }
-    // const response = await axios.get(process.env.SERVER_DESIGN + `mask=mask_bone_big&background=background_32&text=Chewis&id=${packId}`)
-    // const attachments = []
+    const response = await axios.get(process.env.SERVER_DESIGN + `mask=${designInfo.FORMA}&background=background_${designInfo.FONDO}&text=${designInfo.NOMBRE}&id=${packId}`)
+    console.log(response.data)
+    const attachments = []
     // attachments.push(response.data)
     // console.log(response.data)
     // sendMessage(user, buyer, packId, '', attachments)
     const image = fs.createReadStream('src/image_processing/outputs/' + packId + '.png')
     const formData = new FormData()
     formData.append('file', image, 'hola.png')
-    console.log(formData)
     const response2 = await axios.post(baseUrl + '/messages/attachments?tag=post_sale&site_id=MLM',
       formData,
       {
@@ -125,7 +168,9 @@ async function handleDesign (user, buyer, packId, message) {
           'Content-Type': `multipart/form-data; boundary=${image._boundary}`
         }
       })
-    console.log(response2)
+    attachments.push(response2.data.id)
+    await sendMessage(user, buyer, packId, '', attachments)
+    await getMessages(user, packId)
   } catch (error) {
     error.message = 'Error sending automatic design: ' + error.message
     console.log(error.message)
@@ -151,11 +196,82 @@ async function sendAutoGeneralMessage (user, buyer, packId) {
   }
 }
 
-async function sendAutoMessages (user, date) {
-  let orders
-  // check unread messages first
+async function processMessages (messages, user, packId) {
+  let motives
+  try {
+    motives = await getMessageMotives(user.personal_token, packId)
+  } catch (error) {
+    console.log(error.message)
+    const errorData = error.response.data
+    if (errorData === undefined) { return false }
+    if (errorData.code !== 'blocked_by_excepted_case') { return false }
+    console.log(errorData)
+  }
+  if (messages == null) { return false }
+  if (messages.length > 0) {
+    const messageModeration = messages[0].messageModeration
+    if (disabledMessagesModerationTypes.includes(messageModeration)) { return false }
+  }
+  return true
+}
 
-  // then check recent sales
+const designParams = ['FONDO', 'FORMA', 'NOMBRE']
+
+async function handleKeywords (user, messages, packId) {
+  try {
+    const buyer = messages[0].from.user_id
+    let mergedMessage = messages[messages.length - 1].text
+    for (let i = messages.length - 2; i >= 0; i--) {
+      mergedMessage = mergedMessage + ' ' + messages[i].text
+    }
+    mergedMessage = mergedMessage.replace(/\n/g, ' ')
+    mergedMessage = mergedMessage + ' '
+    // keyword time
+    if (mergedMessage.toUpperCase().indexOf('DIS') !== -1 || mergedMessage.toUpperCase().indexOf('FOND') !== -1) {
+      const designInfo = {}
+      for (let i = 0; i < designParams.length; i++) {
+        const regex = mergedMessage.toUpperCase().indexOf(designParams[i])
+        let text = mergedMessage.substring(regex + designParams[i].length + 1, mergedMessage.length)
+        text = text.substring(0, text.indexOf(' '))
+        designInfo[designParams[i]] = text
+      }
+      if (designInfo.FORMA.toUpperCase().includes('HUES')) {
+        designInfo.FORMA = 'mask_bone_big'
+      } else if (designInfo.FORMA.toUpperCase().includes('CORAZ')) {
+        designInfo.FORMA = 'mask_heart_big'
+      }
+      await handleDesign(user, { id: buyer }, packId, designInfo)
+    } else {
+      await getMessages(user, packId)
+    }
+  } catch (error) {
+    error.message = 'Error handling keywords: ' + error.message
+    console.log(error.message)
+  }
+}
+
+async function sendAutoMessages (user, date) {
+  // first unread messages
+  let orders
+  try {
+    // const unreadMessages = await getUnreadMessages(user)
+    // console.log(unreadMessages)
+    const unreadResources = await getUnreadResources(user)
+    for (let i = 0; i < unreadResources.length; i++) {
+      const messages = await getUnreadMessages(user, unreadResources[i])
+      let packId = messages[0].message_resources[0]
+      if (packId.name !== 'packs') {
+        packId = messages[0].message_resources[1]
+      }
+      const process = await processMessages(messages, user, packId.id)
+      if (process) {
+        await handleKeywords(user, messages, packId.id)
+      }
+    }
+    // handleKeywords(user, order.buyer, packId, unreadMessages)
+  } catch (error) {
+    console.log(error.message)
+  }
   try {
     orders = await getOrders(user, date)
   } catch (error) {
@@ -168,30 +284,17 @@ async function sendAutoMessages (user, date) {
     if (!packId) {
       packId = order.id
     }
-    const messages = await getMessages(user, packId)
-    let motives
-    try {
-      motives = await getMessageMotives(user.personal_token, packId)
-    } catch (error) {
-      console.log(error.message)
-      const errorData = error.response.data
-      if (errorData === undefined) { continue }
-      if (errorData.code !== 'blocked_by_excepted_case') { continue }
-      console.log(errorData)
-    }
-    if (messages == null) { continue }
-    if (messages.length > 0) {
-      const messageModeration = messages[0].messageModeration
-      if (disabledMessagesModerationTypes.includes(messageModeration)) { continue }
-    }
-    if (messages.length < 2) {
-      if (messages.length < 1) {
-        sendAutoGeneralMessage(user, order.buyer, packId)
-      } else if (messages[0].from.user_id !== user.id) {
-        sendAutoGeneralMessage(user, order.buyer, packId)
+    const messages = await getMessagesWithoutRead(user, packId)
+    if (processMessages(messages, user, packId)) {
+      if (messages.length < 2) {
+        if (messages.length < 1) {
+          sendAutoGeneralMessage(user, order.buyer, packId)
+        } else if (messages[0].from.user_id !== user.id) {
+          sendAutoGeneralMessage(user, order.buyer, packId)
+        }
       }
     }
-    handleDesign(user, order.buyer, packId, 'diseño')
+    // handleDesign(user, order.buyer, packId, 'diseño')
     // debuging
     // await sendMessage(user, order.buyer, packId, 'Porfavor envielo a la brevedad', null)
   }

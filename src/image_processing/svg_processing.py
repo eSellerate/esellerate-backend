@@ -127,15 +127,17 @@ def generate_no_return():
     if background is None:
         background = ""
     id = request.args.get("id")
+    print(id)
     if id is not None:
         output = location_outputs+id+".svg"
         outputpng = location_outputs+id+".png"
-    shutil.copyfile(default_output, output)
-    shutil.copyfile(default_outputpng, outputpng)
+    print(output)
     svg1 = SVGTree(location_masks + mask, "mask")
     svg2 = SVGTree(location_backgrounds + background)
     svg1.insert_on_id(svg2, "replace")
     svg1.insert_text(request.args.get("text"))
+    shutil.copyfile(default_output, output)
+    shutil.copyfile(default_outputpng, outputpng)
     return (outputpng, 200)
 
 # svg1 = SVGTree('mask_bone_big.svg')
