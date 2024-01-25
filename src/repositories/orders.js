@@ -4,6 +4,7 @@ import HandleAxiosResponse from '../utilities/HandleAxiosResponse.js'
 import 'dotenv/config'
 import { getMercadoLibreSellerIDFromToken, baseUrl } from '../utilities/Utilities.js'
 import { getUserProducts } from './products.js'
+import MessageRelevant from '../models/MessageRelevant.js'
 
 export const getOrder = async (token, order_id) => {
   try {

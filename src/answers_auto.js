@@ -9,6 +9,8 @@ import pkg from 'convert-svg-to-png'
 import path from 'node:path'
 import fs from 'node:fs'
 import FormData from 'form-data'
+import MessageRelevant from './models/MessageRelevant.js'
+import Message from './models/Message.js'
 const { convertFile } = pkg
 
 const keywords = [
@@ -25,10 +27,10 @@ const disabledMessagesModerationTypes = ['forbidden', 'rejected', 'automatic_mes
 let previousDate = new Date('2023-11-10')
 
 export const pngTest = async (req, res) => {
-  const inputFilePath = path.join(global.__dirname, 'image_processing', 'outputs', 'output.svg')
-  console.log(inputFilePath)
-  const outputFilePath = await convertFile(inputFilePath, [])
-  res.sendFile(outputFilePath)
+  let { id } = req.query
+  id = id + '.svg'
+  const filePath = path.join(global.__dirname, 'image_processing', 'outputs', id)
+  res.sendFile(filePath)
 }
 
 async function refreshUserToken (user) {
@@ -170,6 +172,29 @@ async function handleDesign (user, buyer, packId, designInfo) {
       })
     attachments.push(response2.data.id)
     await sendMessage(user, buyer, packId, '', attachments)
+    const relevant =
+    {
+      information: {
+        Forma: designInfo.FORMA,
+        Fondo: designInfo.FONDO,
+        Nombre: designInfo.NOMBRE
+      },
+      image: response2.data.id
+    }
+    const values = {
+      user_id: user.id,
+      order_id: packId,
+      text: JSON.stringify(relevant)
+    }
+    await MessageRelevant.findOne({
+      where: {
+        user_id: user.id,
+        order_id: packId
+      }
+    }).then(function (obj) {
+      if (obj) { return obj.update(values) }
+      return MessageRelevant.create(values)
+    })
     await getMessages(user, packId)
   } catch (error) {
     error.message = 'Error sending automatic design: ' + error.message

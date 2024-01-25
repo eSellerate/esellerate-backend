@@ -57,7 +57,27 @@ export const getMessageByMessageID = async (token, id) => {
       }
     }
     const response = await axios.get(url, options)
-    console.log(response.data)
+    console.log('getting messages')
+    for (let i = 0; i < response.data.messages.length; i++) {
+      const message = response.data.messages[i]
+      if (message.message_attachments) {
+        for (let j = 0; j < message.message_attachments.length; j++) {
+          const attachment = message.message_attachments[j]
+          const response2 = await axios.get(`https://api.mercadolibre.com/messages/attachments/${attachment.filename}?tag=post_sale&site_id=MLM`,
+            {
+              responseType: 'arraybuffer',
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+          )
+          console.log('testing')
+          const base64ImageString = Buffer.from(response2.data, 'binary').toString('base64')
+          response.data.messages[i].message_attachments[j].image = base64ImageString
+        }
+        console.log(response.data.messages[i].message_attachments)
+      }
+    }
     return HandleAxiosResponse.handleSuccess(response)
   } catch (error) {
     return HandleAxiosResponse.handleError(error)

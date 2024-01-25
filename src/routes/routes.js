@@ -49,6 +49,7 @@ import { validateLogin, validateRegister } from '../validator/validators.js'
 import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
 import { getMercadoLibreToken } from '../middlewares/mercadolibre/getMercadoLibreToken.js'
 import {
+  getMercadoLibreImportantInformation,
   getMercadoLibreOrder,
   getMercadoLibreOrderBySearch,
   getMercadoLibreOrderProducts,
@@ -129,6 +130,9 @@ router.get('/mercado-libre/orders_pending',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersPending)
 router.get('/mercado-libre/orders_unfulfilled',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersUnfulfilled)
+
+router.get('/mercado-libre/important_information',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreImportantInformation)
 
 // messages
 router.get('/mercado-libre/messages',
