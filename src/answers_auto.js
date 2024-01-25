@@ -77,7 +77,7 @@ async function getMessages (user, packId) {
 async function sendMessage (user, buyer, packId, text, attachments) {
   try {
     let attachmentsIds = []
-    if (attachments !== null) { attachmentsIds = await processAttachments(attachments, user.personal_token) }
+    if (attachments !== null) { attachmentsIds = attachments }
     const response = await axios.post(baseUrl + `/messages/packs/${packId}/sellers/${user.id}?tag=post_sale`,
       {
         from: {
@@ -107,19 +107,21 @@ async function handleDesign (user, buyer, packId, message) {
   try {
     // get parameters
     if (!message.includes('diseño')) { return }
-    const response = await axios.get(process.env.SERVER_DESIGN + `mask=mask_bone_big&background=background_32&text=Chewis&id=${packId}`)
+    // const response = await axios.get(process.env.SERVER_DESIGN + `mask=mask_bone_big&background=background_32&text=Chewis&id=${packId}`)
     // const attachments = []
     // attachments.push(response.data)
-    console.log(response.data)
+    // console.log(response.data)
     // sendMessage(user, buyer, packId, '', attachments)
-    const image = fs.createReadStream('src/image_processing/' + response.data)
+    const image = fs.createReadStream('src/image_processing/outputs/' + packId + '.png')
     const formData = new FormData()
-    formData.append('file', image, path.basename(response.data))
+    formData.append('file', image)
+    console.log(formData)
     const response2 = await axios.post(baseUrl + '/messages/attachments?tag=post_sale&site_id=MLM',
-      formData, {
+      formData,
+      {
         headers: {
           Authorization: `Bearer ${user.personal_token}`,
-          'content-type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data'
         }
       })
   } catch (error) {
