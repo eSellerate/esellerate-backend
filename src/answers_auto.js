@@ -8,6 +8,7 @@ import { getMessageMotives, processAttachments } from './repositories/messages.j
 import pkg from 'convert-svg-to-png'
 import path from 'node:path'
 import fs from 'node:fs'
+import FormData from 'form-data'
 const { convertFile } = pkg
 
 const keywords = [
@@ -114,16 +115,17 @@ async function handleDesign (user, buyer, packId, message) {
     // sendMessage(user, buyer, packId, '', attachments)
     const image = fs.createReadStream('src/image_processing/outputs/' + packId + '.png')
     const formData = new FormData()
-    formData.append('file', image)
+    formData.append('file', image, 'hola.png')
     console.log(formData)
     const response2 = await axios.post(baseUrl + '/messages/attachments?tag=post_sale&site_id=MLM',
       formData,
       {
         headers: {
           Authorization: `Bearer ${user.personal_token}`,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': `multipart/form-data; boundary=${image._boundary}`
         }
       })
+    console.log(response2)
   } catch (error) {
     error.message = 'Error sending automatic design: ' + error.message
     console.log(error.message)
