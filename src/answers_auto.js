@@ -4,7 +4,14 @@ import AnswersAutoGeneral from './models/AnswersAutoGeneral.js'
 import MercadolibreApp from './models/MercadolibreApp.js'
 import axios from 'axios'
 import { baseUrl } from './utilities/Utilities.js'
-import { getMessageMotives } from './repositories/messages.js'
+import { getMessageMotives, processAttachments } from './repositories/messages.js'
+import pkg from 'convert-svg-to-png'
+import path from 'node:path'
+import fs from 'node:fs'
+import FormData from 'form-data'
+import MessageRelevant from './models/MessageRelevant.js'
+import Message from './models/Message.js'
+const { convertFile } = pkg
 
 const keywords = [
   { word: 'Nombre', uid: 'name' },
@@ -18,6 +25,13 @@ const keywords = [
 const disabledMessagesModerationTypes = ['forbidden', 'rejected', 'automatic_message']
 
 let previousDate = new Date('2023-11-10')
+
+export const pngTest = async (req, res) => {
+  let { id } = req.query
+  id = id + '.svg'
+  const filePath = path.join(global.__dirname, 'image_processing', 'outputs', id)
+  res.sendFile(filePath)
+}
 
 async function refreshUserToken (user) {
   const { client_id, client_secret } = global.gmercadoLibreApp
@@ -63,25 +77,231 @@ async function getMessages (user, packId) {
   return response.data.messages
 }
 
-async function sendAutoGeneralMessages (user, order) {
+async function getMessagesWithoutRead (user, packId) {
+  const response = await axios.get(baseUrl + `/messages/packs/${packId}/sellers/${user.id}?tag=post_sale&mark_as_read=false`,
+    {
+      headers: {
+        Authorization: `Bearer ${user.personal_token}`
+      }
+    }
+  )
+  return response.data.messages
+}
+
+async function getUnreadMessages (user, result) {
+  try {
+    const response = await axios.get(baseUrl + `/messages/${result.resource}?tag=post_sale&mark_as_read=false`,
+      {
+        headers: {
+          Authorization: `Bearer ${user.personal_token}`
+        }
+      }
+    )
+    const messages = response.data.messages.slice(0, result.count)
+    return messages
+  } catch (error) {
+    error.message = 'Error getting unread messages : ' + error.message
+    throw (error)
+  }
+}
+
+async function getUnreadResources (user) {
+  try {
+    const response = await axios.get(baseUrl + '/messages/unread?role=seller&tag=post_sale',
+      {
+        headers: {
+          Authorization: `Bearer ${user.personal_token}`
+        }
+      }
+    )
+    return response.data.results
+  } catch (error) {
+    error.message = 'Error getting unread messages : ' + error.message
+    throw (error)
+  }
+}
+
+async function sendMessage (user, buyer, packId, text, attachments) {
+  try {
+    let attachmentsIds = []
+    if (attachments !== null) { attachmentsIds = attachments }
+    const response = await axios.post(baseUrl + `/messages/packs/${packId}/sellers/${user.id}?tag=post_sale`,
+      {
+        from: {
+          user_id: user.id
+        },
+        to: {
+          user_id: buyer.id
+        },
+        text,
+        attachments: attachmentsIds
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${user.personal_token}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    error.message = 'Error sending automatic message: ' + error.message
+    console.log(error.message)
+    console.log(error.response.data)
+  }
+}
+
+async function handleDesign (user, buyer, packId, designInfo) {
+  try {
+    // get parameters
+    const response = await axios.get(process.env.SERVER_DESIGN + `mask=${designInfo.FORMA}&background=background_${designInfo.FONDO}&text=${designInfo.NOMBRE}&id=${packId}`)
+    console.log(response.data)
+    const attachments = []
+    // attachments.push(response.data)
+    // console.log(response.data)
+    // sendMessage(user, buyer, packId, '', attachments)
+    const image = fs.createReadStream('src/image_processing/outputs/' + packId + '.png')
+    const formData = new FormData()
+    formData.append('file', image, 'hola.png')
+    const response2 = await axios.post(baseUrl + '/messages/attachments?tag=post_sale&site_id=MLM',
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${user.personal_token}`,
+          'Content-Type': `multipart/form-data; boundary=${image._boundary}`
+        }
+      })
+    attachments.push(response2.data.id)
+    await sendMessage(user, buyer, packId, '', attachments)
+    const relevant =
+    {
+      information: {
+        Forma: designInfo.FORMA,
+        Fondo: designInfo.FONDO,
+        Nombre: designInfo.NOMBRE
+      },
+      image: response2.data.id
+    }
+    const values = {
+      user_id: user.id,
+      order_id: packId,
+      text: JSON.stringify(relevant)
+    }
+    await MessageRelevant.findOne({
+      where: {
+        user_id: user.id,
+        order_id: packId
+      }
+    }).then(function (obj) {
+      if (obj) { return obj.update(values) }
+      return MessageRelevant.create(values)
+    })
+    await getMessages(user, packId)
+  } catch (error) {
+    error.message = 'Error sending automatic design: ' + error.message
+    console.log(error.message)
+    console.log(error.response.data)
+  }
+}
+
+async function sendAutoGeneralMessage (user, buyer, packId) {
+  console.log('Sending first message')
   const autoGeneral = await AnswersAutoGeneral.findAll({
     where: {
       user_id: user.id
     },
     raw: true
   })
+  for (let i = 0; i < autoGeneral.length; i++) {
+    try {
+      await sendMessage(user, buyer, packId, autoGeneral[i].text, null)
+    } catch (error) {
+      console.log(error.message)
+      return
+    }
+  }
+}
+
+async function processMessages (messages, user, packId) {
+  let motives
+  try {
+    motives = await getMessageMotives(user.personal_token, packId)
+  } catch (error) {
+    console.log(error.message)
+    const errorData = error.response.data
+    if (errorData === undefined) { return false }
+    if (errorData.code !== 'blocked_by_excepted_case') { return false }
+    console.log(errorData)
+  }
+  if (messages == null) { return false }
+  if (messages.length > 0) {
+    const messageModeration = messages[0].messageModeration
+    if (disabledMessagesModerationTypes.includes(messageModeration)) { return false }
+  }
+  return true
+}
+
+const designParams = ['FONDO', 'FORMA', 'NOMBRE']
+
+async function handleKeywords (user, messages, packId) {
+  try {
+    const buyer = messages[0].from.user_id
+    let mergedMessage = messages[messages.length - 1].text
+    for (let i = messages.length - 2; i >= 0; i--) {
+      mergedMessage = mergedMessage + ' ' + messages[i].text
+    }
+    mergedMessage = mergedMessage.replace(/\n/g, ' ')
+    mergedMessage = mergedMessage + ' '
+    // keyword time
+    if (mergedMessage.toUpperCase().indexOf('DIS') !== -1 || mergedMessage.toUpperCase().indexOf('FOND') !== -1) {
+      const designInfo = {}
+      for (let i = 0; i < designParams.length; i++) {
+        const regex = mergedMessage.toUpperCase().indexOf(designParams[i])
+        let text = mergedMessage.substring(regex + designParams[i].length + 1, mergedMessage.length)
+        text = text.substring(0, text.indexOf(' '))
+        designInfo[designParams[i]] = text
+      }
+      if (designInfo.FORMA.toUpperCase().includes('HUES')) {
+        designInfo.FORMA = 'mask_bone_big'
+      } else if (designInfo.FORMA.toUpperCase().includes('CORAZ')) {
+        designInfo.FORMA = 'mask_heart_big'
+      }
+      await handleDesign(user, { id: buyer }, packId, designInfo)
+    } else {
+      await getMessages(user, packId)
+    }
+  } catch (error) {
+    error.message = 'Error handling keywords: ' + error.message
+    console.log(error.message)
+  }
 }
 
 async function sendAutoMessages (user, date) {
+  // first unread messages
   let orders
-  // check unread messages first
-
-  // then check recent sales
+  try {
+    // const unreadMessages = await getUnreadMessages(user)
+    // console.log(unreadMessages)
+    const unreadResources = await getUnreadResources(user)
+    for (let i = 0; i < unreadResources.length; i++) {
+      const messages = await getUnreadMessages(user, unreadResources[i])
+      let packId = messages[0].message_resources[0]
+      if (packId.name !== 'packs') {
+        packId = messages[0].message_resources[1]
+      }
+      const process = await processMessages(messages, user, packId.id)
+      if (process) {
+        await handleKeywords(user, messages, packId.id)
+      }
+    }
+    // handleKeywords(user, order.buyer, packId, unreadMessages)
+  } catch (error) {
+    console.log(error.message)
+  }
   try {
     orders = await getOrders(user, date)
   } catch (error) {
-    console.log(error.message)
-    return
+    error.message = 'error getting orders: ' + error.message
+    throw error
   }
   for (let i = 0; i < orders.length; i++) {
     const order = orders[i]
@@ -89,24 +309,19 @@ async function sendAutoMessages (user, date) {
     if (!packId) {
       packId = order.id
     }
-    const messages = await getMessages(user, packId)
-    const motives = await getMessageMotives(user.personal_token, user.id)
-    if (messages == null) { return }
-    if (messages.data.messages.length > 0) {
-      const messageModeration = messages[0].messageModeration
-      if (disabledMessagesModerationTypes.includes(messageModeration)) { return }
-    }
-    if (motives.status_code != null) {
-      if (motives.code === 'blocked_by_excepted_case') {
-        // process message
-        return
+    const messages = await getMessagesWithoutRead(user, packId)
+    if (processMessages(messages, user, packId)) {
+      if (messages.length < 2) {
+        if (messages.length < 1) {
+          sendAutoGeneralMessage(user, order.buyer, packId)
+        } else if (messages[0].from.user_id !== user.id) {
+          sendAutoGeneralMessage(user, order.buyer, packId)
+        }
       }
     }
-    if (messages.length < 2) {
-      if (messages.length < 1) {
-        // if (messages[0])
-      }
-    }
+    // handleDesign(user, order.buyer, packId, 'diseño')
+    // debuging
+    // await sendMessage(user, order.buyer, packId, 'Porfavor envielo a la brevedad', null)
   }
 }
 
@@ -127,10 +342,17 @@ export async function answersAuto (newDate) {
         console.log(error.message)
         continue
       }
-      sendAutoMessages(user, previousDate)
+      try {
+        sendAutoMessages(user, previousDate)
+      } catch (error) {
+        console.log('error sending automatic messages')
+        console.log(error.message)
+        continue
+      }
     }
     previousDate = newDate
   } catch (error) {
+    console.log('whole auto messages crash! :')
     console.log(error.message)
   }
 }

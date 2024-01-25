@@ -49,6 +49,7 @@ import { validateLogin, validateRegister } from '../validator/validators.js'
 import { checkCookieCredentials } from '../middlewares/security/checkCredentials.js'
 import { getMercadoLibreToken } from '../middlewares/mercadolibre/getMercadoLibreToken.js'
 import {
+  getMercadoLibreImportantInformation,
   getMercadoLibreOrder,
   getMercadoLibreOrderBySearch,
   getMercadoLibreOrderProducts,
@@ -60,7 +61,7 @@ import {
 } from '../controllers/orders.controller.js'
 import { getMercadoLibreMessageAttachment, getMercadoLibreMessageByMessageID, getMercadoLibreMessageMotives, getMercadoLibreMessages, sendMercadoLibreMessage } from '../controllers/messages.controller.js'
 import { getAnswersQuick, setAnswerQuick, deleteAnswerQuick } from '../controllers/answersquick.controller.js'
-import { handleNotifications } from '../answers_auto.js'
+import { handleNotifications, pngTest } from '../answers_auto.js'
 
 const router = Router()
 
@@ -130,6 +131,9 @@ router.get('/mercado-libre/orders_pending',
 router.get('/mercado-libre/orders_unfulfilled',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreOrdersUnfulfilled)
 
+router.get('/mercado-libre/important_information',
+  checkCookieCredentials, getMercadoLibreToken, getMercadoLibreImportantInformation)
+
 // messages
 router.get('/mercado-libre/messages',
   checkCookieCredentials, getMercadoLibreToken, getMercadoLibreMessages)
@@ -155,6 +159,7 @@ router.get('/mercado-libre/blacklist', checkCookieCredentials, getMercadoLibreTo
 router.post('/mercado-libre/unblacklist', checkCookieCredentials, getMercadoLibreToken, unBlacklistUser)
 router.post('/mercado-libre/blacklistusers', checkCookieCredentials, getMercadoLibreToken, blacklistUsers)
 router.post('/login', login)
+router.get('/png_test', pngTest)
 router.post('/notifications', handleNotifications)
 router.post('/generate-order', checkCookieCredentials, getMercadoLibreToken, generateSaleOrder)
 

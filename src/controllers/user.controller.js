@@ -399,7 +399,6 @@ export const blacklistUser = async (token, sellerid, buyerid, type) => {
     return response.data
   } catch (error) {
     console.log('error on blacklist')
-    console.log(error)
     console.log(error.message)
   }
 }
